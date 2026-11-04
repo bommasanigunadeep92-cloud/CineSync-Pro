@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPro – Welcome & Portal Selection</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=2.2">
+</head>
+<body class="dark-theme landing-body">
+    <!-- Ambient Background Glows -->
+    <div class="portal-ambient-glow glow-top-left"></div>
+    <div class="portal-ambient-glow glow-bottom-right"></div>
+
+    <!-- Header -->
+    <header class="landing-header">
+        <div class="landing-nav-container">
+            <div class="landing-brand">
+                <div class="logo-icon-wrapper">
+                    <i class="fa-solid fa-film logo-icon"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Cinema<span class="gradient-text">Pro</span></span>
+                    <span class="logo-subtitle">Enterprise Cinema Management & Booking System</span>
+                </div>
+            </div>
+            <div class="landing-meta-pill">
+                <span class="pulse-dot"></span>
+                <span>OS Multithreading & Mutex Architecture &bull; B.Tech CSE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="landing-main">
+        <div class="landing-hero">
+            <div class="badge-tech" style="margin-bottom: 16px;">
+                <i class="fa-solid fa-layer-group"></i> Secure Role-Based Access Control (RBAC)
+            </div>
+            <h1 class="landing-title">Welcome to Cinema<span class="gradient-text">Pro</span></h1>
+            <p class="landing-subtitle">
+                Please select your designated portal to continue. Customers and administrators have independent authentication, dedicated dashboards, and strict role authorization.
+            </p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="login-flash-messages" style="max-width: 600px; margin: 0 auto 24px auto;">
+                    {% for category, message in messages %}
+                        <div class="login-flash-alert alert-{{ category }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Two Portal Cards Grid -->
+        <div class="portal-cards-grid">
+            <!-- 1. CUSTOMER PORTAL CARD -->
+            <div class="portal-card customer-portal-card dashboard-card">
+                <div class="portal-card-header">
+                    <div class="portal-icon-box customer-icon-box">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <span class="portal-badge badge-customer">For Moviegoers & Groups</span>
+                </div>
+                <div class="portal-card-body">
+                    <h2 class="portal-card-title">Customer Portal</h2>
+                    <p class="portal-card-desc">
+                        Browse currently showing movies, select seats interactively in real time, book group tickets, and access your personal booking history.
+                    </p>
+
+                    <div class="portal-features-list">
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>Browse theatrical shows with official movie posters</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>Interactive 20-seat layout with live green/red/purple status</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>Atomic multi-seat group ticket reservations</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>Instant printable digital E-Tickets in ₹ INR</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>Personal booking history & eligible cancellation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portal-card-actions">
+                    <a href="/customer/login" class="btn btn-primary btn-lg btn-glow w-100 portal-action-btn">
+                        <i class="fa-solid fa-right-to-bracket"></i> Customer Sign In
+                    </a>
+                    <a href="/customer/register" class="btn btn-outline btn-md w-100 portal-action-btn-secondary">
+                        <i class="fa-solid fa-user-plus"></i> New Customer? Register Here
+                    </a>
+                    <div class="eval-hint-row">
+                        <span>Demo Account:</span>
+                        <code>customer1</code> / <code>pass123</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ADMINISTRATOR PORTAL CARD -->
+            <div class="portal-card admin-portal-card dashboard-card">
+                <div class="portal-card-header">
+                    <div class="portal-icon-box admin-icon-box">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <span class="portal-badge badge-admin">For Staff & University Faculty</span>
+                </div>
+                <div class="portal-card-body">
+                    <h2 class="portal-card-title">Administrator Portal</h2>
+                    <p class="portal-card-desc">
+                        Full cinema control center for box-office management, concurrency telemetry, Mutex & Semaphore monitoring, and multithreaded stress testing.
+                    </p>
+
+                    <div class="portal-features-list">
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-shield-check text-purple"></i>
+                            <span>Manage all cinema screenings & 80 seats</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-shield-check text-purple"></i>
+                            <span>View & manage all customer bookings globally</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-shield-check text-purple"></i>
+                            <span>Create walk-in reservations on behalf of customers</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-shield-check text-purple"></i>
+                            <span>Live Mutex lock status & Counting Semaphore controls</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-shield-check text-purple"></i>
+                            <span>Multithreaded Race Condition Simulator (2–15 threads)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portal-card-actions">
+                    <a href="/admin/login" class="btn btn-purple btn-lg btn-glow w-100 portal-action-btn">
+                        <i class="fa-solid fa-lock"></i> Administrator Sign In
+                    </a>
+                    <div class="admin-safe-note">
+                        <i class="fa-solid fa-user-lock"></i> Restricted Area: Admin credentials required
+                    </div>
+                    <div class="eval-hint-row">
+                        <span>Faculty Evaluation:</span>
+                        <code>admin</code> / <code>admin123</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared Backend Concurrency Note -->
+        <div class="shared-backend-banner">
+            <div class="banner-icon">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+            <div class="banner-text">
+                <strong>Shared Backend Concurrency Engine &bull; Single SQLite Database</strong>
+                <p>Both portals operate concurrently on the exact same SQLite database (<code>cinema.db</code>). Seat reservations made through either portal are synchronized instantaneously using Python <code>threading.Lock()</code> (Mutex) and <code>threading.Semaphore()</code>, guaranteeing absolute data integrity and zero double-bookings.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="landing-footer-container">
+            <span>Cinema Group Ticket Booking System (Product 3) &bull; B.Tech CSE Capstone Project</span>
+            <span>OS Concurrency Laboratory Edition</span>
+        </div>
+    </footer>
+</body>
+</html>

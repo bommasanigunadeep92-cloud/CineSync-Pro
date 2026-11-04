@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPro – Online Movie Ticket Booking</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=2.2">
+</head>
+<body class="dark-theme customer-portal-body">
+    <!-- Background Ambient Glows -->
+    <div class="portal-ambient-glow glow-top-left"></div>
+    <div class="portal-ambient-glow glow-bottom-right"></div>
+
+    <!-- ========================================================================= -->
+    <!-- CUSTOMER HEADER & NAVIGATION -->
+    <!-- ========================================================================= -->
+    <header class="customer-navbar">
+        <div class="customer-nav-container">
+            <!-- Brand Logo -->
+            <a href="/" class="customer-brand">
+                <div class="logo-icon-wrapper">
+                    <i class="fa-solid fa-film logo-icon"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Cinema<span class="gradient-text">Pro</span></span>
+                    <span class="logo-subtitle">Online Ticket Booking</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="customer-nav-links">
+                <a href="#now-showing" class="c-nav-link active"><i class="fa-solid fa-clapperboard"></i> Now Showing</a>
+                <a href="#seat-selection" class="c-nav-link"><i class="fa-solid fa-couch"></i> Select Seats</a>
+                <a href="#customer-checkout" class="c-nav-link"><i class="fa-solid fa-ticket"></i> Group Booking</a>
+                <button class="c-nav-link btn-link" id="openFindTicketBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Find My Ticket
+                </button>
+            </nav>
+
+            <!-- Actions: Clock & Admin Login -->
+            <div class="customer-nav-actions">
+                <div class="customer-clock-pill">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="custLiveClock">--:--:--</span>
+                </div>
+                <a href="/admin" class="btn btn-outline btn-sm admin-entry-pill" title="For University Evaluators & Cinema Administrators">
+                    <i class="fa-solid fa-shield-halved"></i> Staff / Admin Portal
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- HERO BANNER -->
+    <!-- ========================================================================= -->
+    <section class="customer-hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                <span>Live Online Reservation Platform &bull; Concurrency Protected</span>
+            </div>
+            <h1 class="hero-title">Experience Cinema Like Never Before</h1>
+            <p class="hero-subtitle">
+                Reserve premium seats online individually or as a group. Powered by real-time OS Mutex locking ensuring guaranteed zero double-bookings.
+            </p>
+            <div class="hero-features-row">
+                <div class="feature-item">
+                    <i class="fa-solid fa-shield-check feature-icon text-success"></i>
+                    <span>Real-time Mutex Seat Locking</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-users feature-icon text-purple"></i>
+                    <span>Atomic Multi-Seat Group Booking</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-indian-rupee-sign feature-icon text-blue"></i>
+                    <span>Instant Digital E-Tickets in ₹ INR</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN CONTENT CONTAINER -->
+    <!-- ========================================================================= -->
+    <main class="customer-main-container">
+
+        <!-- 1. NOW SHOWING SECTION -->
+        <section class="customer-section" id="now-showing">
+            <div class="section-header-row">
+                <div>
+                    <h2 class="section-title"><i class="fa-solid fa-film"></i> Now Showing at CinemaPro</h2>
+                    <p class="section-subtitle">Select a movie screening below to open the interactive seat reservation layout</p>
+                </div>
+            </div>
+            <div class="movies-showcase-grid" id="custMoviesGrid">
+                <!-- Populated dynamically via /api/shows by customer.js -->
+                <div class="loading-state-card">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading current theatrical screenings...
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. INTERACTIVE SEAT SELECTION -->
+        <section class="customer-section" id="seat-selection">
+            <div class="section-header-row">
+                <div>
+                    <h2 class="section-title"><i class="fa-solid fa-couch"></i> Interactive Seat Selection</h2>
+                    <p class="section-subtitle">Choose your preferred seats on the 20-seat interactive cinema floor map</p>
+                </div>
+                <div class="show-selection-bar">
+                    <label for="custShowSelect" class="form-label-inline"><i class="fa-solid fa-film"></i> Movie Screening:</label>
+                    <select id="custShowSelect" class="custom-select">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="cinema-hall-container dashboard-card">
+                <!-- Hall Info Bar -->
+                <div class="cinema-hall-header">
+                    <div class="current-show-info" style="display: flex; align-items: center; gap: 14px;">
+                        <img id="custHallShowPoster" src="/static/images/inception.jpg" alt="Poster" class="hall-show-thumb">
+                        <div>
+                            <span class="hall-label">Currently Selected Screening</span>
+                            <h3 class="hall-show-title" id="custHallTitle">Loading...</h3>
+                            <div class="hall-meta">
+                                <span><i class="fa-regular fa-clock"></i> <strong id="custHallTime">--</strong></span>
+                                <span class="divider">&bull;</span>
+                                <span><i class="fa-solid fa-desktop"></i> <strong id="custHallScreen">--</strong></span>
+                                <span class="divider">&bull;</span>
+                                <span class="hall-price-badge" id="custHallPrice">₹-- / seat</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Quick Group Selectors -->
+                    <div class="quick-group-select">
+                        <span class="quick-select-label"><i class="fa-solid fa-users"></i> Quick Group Select:</span>
+                        <div class="quick-btn-group">
+                            <button type="button" class="btn btn-outline btn-sm cust-quick-select" data-count="2">+2 Seats</button>
+                            <button type="button" class="btn btn-outline btn-sm cust-quick-select" data-count="3">+3 Seats</button>
+                            <button type="button" class="btn btn-outline btn-sm cust-quick-select" data-count="4">+4 Seats</button>
+                            <button type="button" class="btn btn-outline btn-sm cust-quick-select" data-count="5">+5 Seats</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Curved Cinema Screen -->
+                <div class="screen-indicator-wrapper">
+                    <div class="curved-screen-bar"></div>
+                    <span class="screen-label"><i class="fa-solid fa-play"></i> ALL EYES THIS WAY &bull; CINEMA PROJECTION SCREEN</span>
+                </div>
+
+                <!-- 20 Interactive Seats Grid (A1 to A20) -->
+                <div class="seats-matrix-wrapper">
+                    <div class="seats-grid" id="custSeatsGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Seat Legend -->
+                <div class="seat-legend-bar">
+                    <div class="legend-item">
+                        <div class="seat-sample seat-available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="seat-sample seat-selected"></div>
+                        <span>Selected by You</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="seat-sample seat-booked"></div>
+                        <span>Already Reserved</span>
+                    </div>
+                </div>
+
+                <!-- Floating Selection Dock -->
+                <div class="selection-summary-dock">
+                    <div class="dock-left">
+                        <span class="dock-label">Selected Seats:</span>
+                        <div class="selected-pills-container" id="custSelectedPills">
+                            <span class="no-selection-hint">Click available green seats above or use Quick Group Select.</span>
+                        </div>
+                    </div>
+                    <div class="dock-right">
+                        <div class="dock-pricing">
+                            <span class="dock-seat-count" id="custDockCount">0 Seats</span>
+                            <span class="dock-total-price" id="custDockTotal">₹0.00</span>
+                        </div>
+                        <div class="dock-actions">
+                            <button type="button" class="btn btn-outline btn-sm" id="custClearSeatsBtn">
+                                <i class="fa-solid fa-xmark"></i> Clear
+                            </button>
+                            <button type="button" class="btn btn-primary" id="custProceedBtn" disabled>
+                                <i class="fa-solid fa-arrow-down"></i> Proceed to Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CUSTOMER DETAILS & CHECKOUT -->
+        <section class="customer-section" id="customer-checkout">
+            <div class="section-header-row">
+                <div>
+                    <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Complete Your Reservation</h2>
+                    <p class="section-subtitle">Enter your contact details to receive your confirmed digital E-Ticket</p>
+                </div>
+            </div>
+
+            <div class="checkout-layout-grid">
+                <!-- Customer Details Form -->
+                <div class="dashboard-card checkout-form-card">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fa-solid fa-user-check"></i> Customer Information</h4>
+                        <span class="badge badge-group" id="custBookingTypeBadge">Select Seats Above</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="custBookingForm">
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label class="form-label" for="custName">
+                                        <i class="fa-solid fa-user"></i> Full Name <span class="required-star">*</span>
+                                    </label>
+                                    <input type="text" id="custName" class="form-control" placeholder="e.g. Rahul Sharma" required autocomplete="name">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label class="form-label" for="custPhone">
+                                        <i class="fa-solid fa-phone"></i> Mobile Number <span class="required-star">*</span>
+                                    </label>
+                                    <input type="tel" id="custPhone" class="form-control" placeholder="+91 98765 43210 (10 digits)" required autocomplete="tel">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="custEmail">
+                                    <i class="fa-solid fa-envelope"></i> Email Address (for digital e-ticket)
+                                </label>
+                                <input type="email" id="custEmail" class="form-control" placeholder="rahul@example.com" autocomplete="email">
+                            </div>
+
+                            <!-- Concurrency Notice -->
+                            <div class="concurrency-trust-box">
+                                <div class="trust-icon">
+                                    <i class="fa-solid fa-lock text-success"></i>
+                                </div>
+                                <div class="trust-content">
+                                    <strong>Real-time Concurrency Protection Active</strong>
+                                    <p>Your seats are protected by backend <code>threading.Lock</code> (Mutex) and <code>threading.Semaphore</code>. Competing concurrent requests cannot double-book your selected seats.</p>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg btn-glow w-100" id="custConfirmBtn" disabled>
+                                <i class="fa-solid fa-circle-check"></i> Confirm & Book Tickets
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Order Summary Breakdown -->
+                <div class="dashboard-card checkout-summary-card">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fa-solid fa-ticket"></i> Booking Summary</h4>
+                    </div>
+                    <div class="card-body summary-body">
+                        <div class="summary-movie-row">
+                            <img id="custSummaryThumb" src="/static/images/inception.jpg" alt="Movie" class="summary-poster-thumb">
+                            <div>
+                                <h4 id="custSummaryTitle" class="summary-movie-title">Select a Movie</h4>
+                                <span id="custSummaryMeta" class="summary-movie-meta">Screen 1 &bull; 10:30 AM</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-line-item">
+                            <span class="item-label">Selected Seats:</span>
+                            <strong class="item-val" id="custSummarySeats">None</strong>
+                        </div>
+                        <div class="summary-line-item">
+                            <span class="item-label">Ticket Rate:</span>
+                            <span class="item-val" id="custSummaryRate">₹0.00 / seat</span>
+                        </div>
+                        <div class="summary-line-item">
+                            <span class="item-label">Seat Count:</span>
+                            <span class="item-val" id="custSummaryCount">0</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-line-item total-line">
+                            <span class="item-label">Total Amount Payable:</span>
+                            <strong class="item-val total-price-val" id="custSummaryTotal">₹0.00</strong>
+                        </div>
+                        <div class="summary-badge-footer">
+                            <i class="fa-solid fa-shield-halved text-success"></i>
+                            <span>All prices inclusive of entertainment taxes in INR (₹)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- CONFIRMED E-TICKET MODAL -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="customerTicketModal" style="display: none;">
+        <div class="modal-card ticket-receipt-card">
+            <div class="ticket-top-banner">
+                <div class="ticket-brand-row">
+                    <div class="ticket-brand-title">
+                        <i class="fa-solid fa-film"></i> Cinema<span class="gradient-text">Pro</span>
+                    </div>
+                    <span class="ticket-badge-confirmed"><i class="fa-solid fa-circle-check"></i> CONFIRMED</span>
+                </div>
+                <div class="ticket-ref-box">
+                    <span class="ref-label">BOOKING REFERENCE:</span>
+                    <strong class="ref-code" id="custModalRefCode">TKT-XXXXXX</strong>
+                </div>
+            </div>
+
+            <div class="ticket-body">
+                <div class="ticket-details-grid">
+                    <div class="ticket-detail-item">
+                        <span class="t-label">MOVIE TITLE</span>
+                        <strong class="t-val" id="custModalMovie">Inception (IMAX 2D)</strong>
+                    </div>
+                    <div class="ticket-detail-item">
+                        <span class="t-label">CUSTOMER NAME</span>
+                        <strong class="t-val" id="custModalCustomer">Guest Customer</strong>
+                    </div>
+                    <div class="ticket-detail-item">
+                        <span class="t-label">SCREEN & SHOWTIME</span>
+                        <strong class="t-val" id="custModalTime">10:30 AM &bull; Screen 1</strong>
+                    </div>
+                    <div class="ticket-detail-item">
+                        <span class="t-label">ASSIGNED SEATS</span>
+                        <strong class="t-val text-purple" id="custModalSeats">A1, A2</strong>
+                    </div>
+                </div>
+
+                <div class="ticket-barcode-wrapper">
+                    <div class="simulated-barcode">
+                        <span>||| | | |||| || | ||||| |||| | || | |||| || | |||||</span>
+                    </div>
+                    <div class="barcode-footer">
+                        <span>Show this digital e-ticket at the cinema entrance for verification</span>
+                    </div>
+                </div>
+
+                <div class="ticket-total-row">
+                    <span>Total Amount Paid:</span>
+                    <strong class="text-success" id="custModalTotal">₹0.00</strong>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" id="custModalCloseBtn">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" id="custModalPrintBtn">
+                    <i class="fa-solid fa-print"></i> Print / Download Ticket
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- "FIND MY TICKET" MODAL -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="findTicketModal" style="display: none;">
+        <div class="modal-card" style="max-width: 580px;">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-magnifying-glass"></i> Find My Booked Tickets</h4>
+                <button type="button" class="btn-icon-subtle" id="closeFindTicketBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+                    Enter the phone number or booking reference code used during reservation to view or re-print your tickets:
+                </p>
+                <div class="input-with-icon" style="margin-bottom: 16px;">
+                    <i class="fa-solid fa-ticket input-icon"></i>
+                    <input type="text" id="findTicketInput" class="form-control" placeholder="Enter Mobile Number or Ref Code (e.g. 9876543210 or GRP-ACDA92)">
+                </div>
+                <button type="button" class="btn btn-primary w-100" id="searchTicketBtn">
+                    <i class="fa-solid fa-search"></i> Search Tickets
+                </button>
+
+                <div id="foundTicketsResults" style="margin-top: 20px;">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="custToastContainer"></div>
+
+    <!-- Customer Script -->
+    <script src="/static/customer.js?v=2.2"></script>
+</body>
+</html>

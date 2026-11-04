@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPro – Cinema Group Ticket Booking Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=2.2">
+</head>
+<body class="dark-theme">
+    <div class="app-layout">
+        <!-- ========================================================================= -->
+        <!-- A. SIDEBAR NAVIGATION -->
+        <!-- ========================================================================= -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <div class="logo-icon-wrapper">
+                        <i class="fa-solid fa-film logo-icon"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Cinema<span class="gradient-text">Pro</span></span>
+                        <span class="logo-subtitle">Group Booking Core</span>
+                    </div>
+                </div>
+                <div class="badge-tech">
+                    <span class="pulse-dot"></span>
+                    <span>Multithreading v3.0</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">MAIN NAVIGATION</div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#overview" class="nav-link active" data-section="overview">
+                            <i class="fa-solid fa-chart-pie nav-icon"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#seat-layout" class="nav-link" data-section="seat-layout">
+                            <i class="fa-solid fa-couch nav-icon"></i>
+                            <span>Seat Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#group-booking" class="nav-link" data-section="group-booking">
+                            <i class="fa-solid fa-users-rectangle nav-icon"></i>
+                            <span>Group Booking</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#show-management" class="nav-link" data-section="show-management">
+                            <i class="fa-solid fa-clapperboard nav-icon"></i>
+                            <span>Show Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#booking-history" class="nav-link" data-section="booking-history">
+                            <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+                            <span>Booking History</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="nav-section-title">CONCURRENCY & LAB</div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#os-concepts-lab" class="nav-link highlight-link" data-section="os-concepts-lab">
+                            <i class="fa-solid fa-flask-vial nav-icon"></i>
+                            <span>OS Concepts Lab</span>
+                            <span class="nav-tag nav-tag-gold" id="sidebar-lab-badge">WEEK 2 & 3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#sync-monitor" class="nav-link" data-section="sync-monitor">
+                            <i class="fa-solid fa-shield-halved nav-icon"></i>
+                            <span>Sync Monitor</span>
+                            <span class="nav-tag" id="sidebar-mutex-badge">MUTEX ON</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link" data-section="settings">
+                            <i class="fa-solid fa-sliders nav-icon"></i>
+                            <span>Settings & Presets</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="concurrency-widget">
+                    <div class="widget-row">
+                        <span class="widget-label"><i class="fa-solid fa-lock"></i> Mutex Lock:</span>
+                        <span class="widget-status status-secure" id="sidebar-mutex-status">Active / Safe</span>
+                    </div>
+                    <div class="widget-row">
+                        <span class="widget-label"><i class="fa-solid fa-traffic-light"></i> Semaphore:</span>
+                        <span class="widget-status" id="sidebar-semaphore-status">3/3 Slots Free</span>
+                    </div>
+                </div>
+                <div class="academic-note">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>University Demo Ready</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ========================================================================= -->
+        <!-- MAIN CONTENT WRAPPER -->
+        <!-- ========================================================================= -->
+        <div class="main-wrapper">
+            <!-- ===================================================================== -->
+            <!-- B. HEADER -->
+            <!-- ===================================================================== -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="mobile-toggle-btn" id="mobileToggle" aria-label="Toggle Sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="header-titles">
+                        <h1 class="header-main-title">Admin Dashboard</h1>
+                        <p class="header-welcome-msg">
+                            Welcome back, Lead Administrator <span class="divider">|</span> CinemaPro Concurrency Control Center
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Live Date & Time -->
+                    <div class="header-clock-card">
+                        <div class="clock-icon-box">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="clock-details">
+                            <span class="clock-time" id="liveClockTime">12:00:00 PM</span>
+                            <span class="clock-date" id="liveClockDate">Monday, Nov 2, 2026</span>
+                        </div>
+                    </div>
+
+                    <!-- Notification Dropdown -->
+                    <div class="notification-wrapper">
+                        <button class="icon-circle-btn" id="notificationBtn" title="Concurrency Notifications">
+                            <i class="fa-regular fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount">0</span>
+                        </button>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="dropdown-header">
+                                <h6>Concurrency Event Alerts</h6>
+                                <span class="badge-subtle" id="notificationHeaderCount">0 events</span>
+                            </div>
+                            <div class="dropdown-body" id="notificationList">
+                                <div class="empty-notifications">
+                                    <i class="fa-regular fa-circle-check"></i>
+                                    <p>System operational. No race conflicts detected.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Profile Section -->
+                    <div class="admin-profile-pill">
+                        <div class="avatar-ring">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Admin Avatar" class="admin-avatar">
+                            <span class="status-indicator-dot" title="System Online"></span>
+                        </div>
+                        <div class="profile-info">
+                            <span class="admin-name">{{ session.get('full_name', 'Chief Administrator') }}</span>
+                            <span class="admin-role">{{ session.get('role', 'System Architect') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Dark / Light Theme Toggle -->
+                    <button class="icon-circle-btn theme-toggle-btn" id="themeToggleBtn" title="Switch Theme (Dark / Light)">
+                        <i class="fa-solid fa-moon" id="themeIcon"></i>
+                    </button>
+
+                    <!-- Customer Portal Shortcut -->
+                    <a href="/" target="_blank" class="btn btn-outline btn-sm" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;" title="Open Online Customer Portal in new tab">
+                        <i class="fa-solid fa-globe"></i> Customer Portal
+                    </a>
+
+                    <!-- Logout Button -->
+                    <a href="/logout" class="btn btn-outline btn-sm logout-btn" id="logoutBtn" title="Sign out of Admin Dashboard">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </header>
+
+            <!-- ===================================================================== -->
+            <!-- MAIN DASHBOARD BODY SECTIONS -->
+            <!-- ===================================================================== -->
+            <main class="dashboard-content">
+                <!-- ================================================================= -->
+                <!-- C. STATISTICS CARDS -->
+                <!-- ================================================================= -->
+                <section class="stats-grid" id="statsSection">
+                    <!-- Card 1: Total Confirmed Bookings -->
+                    <div class="stat-card stat-blue">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-container">
+                                <i class="fa-solid fa-ticket"></i>
+                            </div>
+                            <span class="stat-badge"><i class="fa-solid fa-arrow-trend-up"></i> Live DB</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <h3 class="stat-value" id="statTotalBookings">--</h3>
+                            <p class="stat-label">Total Confirmed Bookings</p>
+                        </div>
+                        <div class="stat-card-footer">
+                            <span class="stat-detail"><i class="fa-solid fa-database"></i> SQLite Real-time Records</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Total Booked Seats -->
+                    <div class="stat-card stat-purple">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-container">
+                                <i class="fa-solid fa-couch"></i>
+                            </div>
+                            <span class="stat-badge" id="occupancyRateBadge">0% Occupied</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <h3 class="stat-value" id="statBookedSeats">--</h3>
+                            <p class="stat-label">Total Booked Seats</p>
+                        </div>
+                        <div class="stat-card-footer">
+                            <div class="mini-progress-bar">
+                                <div class="mini-progress-fill" id="occupancyProgressBar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Available Seats -->
+                    <div class="stat-card stat-green">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-container">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <span class="stat-badge status-available-tag">Open for Booking</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <h3 class="stat-value" id="statAvailableSeats">--</h3>
+                            <p class="stat-label">Available Seats</p>
+                        </div>
+                        <div class="stat-card-footer">
+                            <span class="stat-detail">Across 4 Cinema Shows (80 Total)</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Group Bookings -->
+                    <div class="stat-card stat-indigo">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-container">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <span class="stat-badge badge-group">Group Mode</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <h3 class="stat-value" id="statGroupBookings">--</h3>
+                            <p class="stat-label">Group Bookings (≥ 2 Seats)</p>
+                        </div>
+                        <div class="stat-card-footer">
+                            <span class="stat-detail"><i class="fa-solid fa-link"></i> Atomic Multi-Seat Allocations</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- D. BOOKING ANALYTICS (CHARTS) -->
+                <!-- ================================================================= -->
+                <section class="analytics-section" id="overview">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> Booking Analytics & Concurrency Overview</h2>
+                            <p class="section-subtitle">Real-time occupancy analytics and booking distribution by cinema show</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline" id="refreshAnalyticsBtn">
+                                <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <!-- Chart 1: Bookings by Cinema Show -->
+                        <div class="dashboard-card chart-card-large">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h4 class="card-title">Bookings by Cinema Show</h4>
+                                    <span class="card-subtitle">Booked vs Available seats comparison (20 seats capacity per show)</span>
+                                </div>
+                                <div class="chart-legend-custom">
+                                    <span class="legend-dot booked-dot"></span> Booked
+                                    <span class="legend-dot available-dot"></span> Available
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="showsOccupancyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Seat Occupancy Distribution -->
+                        <div class="dashboard-card chart-card-small">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h4 class="card-title">Seat Occupancy Ratio</h4>
+                                    <span class="card-subtitle">Cinema-wide availability ratio</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container doughnut-container">
+                                    <canvas id="seatsRatioChart"></canvas>
+                                </div>
+                                <div class="chart-summary-pills">
+                                    <div class="summary-pill">
+                                        <span class="pill-dot bg-green"></span>
+                                        <span class="pill-label">Available:</span>
+                                        <strong class="pill-num" id="pillAvailableCount">--</strong>
+                                    </div>
+                                    <div class="summary-pill">
+                                        <span class="pill-dot bg-red"></span>
+                                        <span class="pill-label">Booked:</span>
+                                        <strong class="pill-num" id="pillBookedCount">--</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movie Posters Showcase Grid -->
+                    <div class="now-showing-showcase">
+                        <div class="section-header-row" style="margin-top: 24px; margin-bottom: 8px;">
+                            <div>
+                                <h3 class="section-title" style="font-size: 16px;"><i class="fa-solid fa-film"></i> Now Showing at CinemaPro</h3>
+                                <p class="section-subtitle">Real-time theatrical screenings, verified movie posters, and instant booking shortcuts</p>
+                            </div>
+                        </div>
+                        <div class="movies-showcase-grid" id="moviesShowcaseGrid">
+                            <!-- Populated dynamically with poster images by script.js -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- E. INTERACTIVE CINEMA SEAT LAYOUT & MANAGEMENT -->
+                <!-- ================================================================= -->
+                <section class="seat-management-section" id="seat-layout">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-couch"></i> Interactive Cinema Seat Layout</h2>
+                            <p class="section-subtitle">20 seats per show (A1 to A20) with real-time status & atomic group selection</p>
+                        </div>
+                        <div class="show-selection-bar">
+                            <label for="showSelectDropdown" class="form-label-inline"><i class="fa-solid fa-film"></i> Select Show:</label>
+                            <select id="showSelectDropdown" class="custom-select">
+                                <option value="1">Show 1: Inception (IMAX 2D) - 10:30 AM</option>
+                                <option value="2">Show 2: Interstellar (Dolby Cinema) - 02:15 PM</option>
+                                <option value="3">Show 3: Oppenheimer (70mm Experience) - 06:00 PM</option>
+                                <option value="4">Show 4: The Dark Knight (Director's Cut) - 09:30 PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="cinema-hall-container dashboard-card">
+                        <!-- Top Cinema Controls -->
+                        <div class="hall-header-controls">
+                            <div class="current-show-badge" id="currentShowBadge">
+                                <img id="currentShowPoster" src="/static/images/inception.jpg" class="hall-show-thumb" alt="Movie Poster" onerror="this.onerror=null; this.src='/static/images/fallback_poster.svg';">
+                                <div>
+                                    <span id="currentShowTitle">Inception (IMAX 2D)</span>
+                                    <div style="margin-top: 2px;">
+                                        <span class="badge-time" id="currentShowTime">10:30 AM</span>
+                                        <span class="badge-price" id="currentShowPrice">₹350.00 / seat</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="quick-group-selectors">
+                                <span class="quick-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Quick Group Select:</span>
+                                <button class="btn btn-chip" data-quick-select="2">+2 Seats</button>
+                                <button class="btn btn-chip" data-quick-select="3">+3 Seats</button>
+                                <button class="btn btn-chip" data-quick-select="4">+4 Seats</button>
+                                <button class="btn btn-chip" data-quick-select="5">+5 Seats</button>
+                                <button class="btn btn-chip btn-chip-danger" id="clearSelectionBtn">
+                                    <i class="fa-solid fa-xmark"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cinema Screen Curvature Visual -->
+                        <div class="cinema-screen-area">
+                            <div class="screen-glow"></div>
+                            <div class="screen-bar">
+                                <span><i class="fa-solid fa-video"></i> CINEMA SCREEN / ALL EYES THIS WAY</span>
+                            </div>
+                        </div>
+
+                        <!-- Seating Grid (20 Seats: Row A1-A10, Row A11-A20) -->
+                        <div class="seating-plan-wrapper">
+                            <div class="seating-grid" id="seatsGrid">
+                                <!-- Generated dynamically by script.js (A1 through A20) -->
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="seating-legend">
+                            <div class="legend-item">
+                                <div class="seat-sample seat-available-sample"></div>
+                                <span>Available (Green)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="seat-sample seat-booked-sample"></div>
+                                <span>Booked (Red)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="seat-sample seat-selected-sample"></div>
+                                <span>Selected (Purple / Blue)</span>
+                            </div>
+                        </div>
+
+                        <!-- Selection Summary Bar -->
+                        <div class="selection-summary-dock">
+                            <div class="dock-left">
+                                <div class="selected-seats-pills-container">
+                                    <span class="dock-label">Selected Seats:</span>
+                                    <div class="pills-list" id="selectedSeatsPills">
+                                        <span class="no-selection-hint">No seats selected. Click seats above or use Quick Select.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dock-right">
+                                <div class="dock-price-calc">
+                                    <span class="dock-seats-count" id="dockSelectedCount">0 Seats</span>
+                                    <span class="dock-total-price" id="dockTotalPrice">₹0.00</span>
+                                </div>
+                                <button class="btn btn-primary btn-glow" id="proceedToBookBtn" disabled>
+                                    <i class="fa-solid fa-arrow-right"></i> Book Selected Seats
+                                </button>
+                                <button class="btn btn-danger-subtle" id="resetShowSeatsBtn" title="Reset all 20 seats for this show">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset Show Seats
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- F. GROUP BOOKING FORM -->
+                <!-- ================================================================= -->
+                <section class="group-booking-section" id="group-booking">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-users-rectangle"></i> Group Ticket Booking Terminal</h2>
+                            <p class="section-subtitle">Book individual or multi-seat group tickets with selectable synchronization modes</p>
+                        </div>
+                    </div>
+
+                    <div class="booking-grid">
+                        <!-- Form Card -->
+                        <div class="dashboard-card form-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fa-solid fa-ticket-simple"></i> Ticket Reservation Details</h4>
+                                <span class="badge-subtle" id="formBookingTypeBadge">Group Booking</span>
+                            </div>
+                            <div class="card-body">
+                                <form id="ticketBookingForm">
+                                    <div class="form-row">
+                                        <div class="form-group col-6">
+                                            <label class="form-label" for="bookingCustomerName">
+                                                <i class="fa-solid fa-user"></i> Customer / Group Name *
+                                            </label>
+                                            <input type="text" id="bookingCustomerName" class="form-control" placeholder="e.g. Stanford CS Research Team" required>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label class="form-label" for="bookingPhone">
+                                                <i class="fa-solid fa-phone"></i> Contact Phone (min 10 digits) *
+                                            </label>
+                                            <input type="tel" id="bookingPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-6">
+                                            <label class="form-label" for="bookingEmail">
+                                                <i class="fa-solid fa-envelope"></i> Email Address
+                                            </label>
+                                            <input type="email" id="bookingEmail" class="form-control" placeholder="e.g. lead@stanford.edu">
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label class="form-label" for="bookingShowSelect">
+                                                <i class="fa-solid fa-film"></i> Cinema Show *
+                                            </label>
+                                            <select id="bookingShowSelect" class="form-control custom-select" required>
+                                                <!-- Populated dynamically -->
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Selected Seats Display -->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fa-solid fa-chair"></i> Allocated Seats
+                                            <span class="label-helper">(Select from seat map or edit list)</span>
+                                        </label>
+                                        <div class="allocated-seats-wrapper">
+                                            <input type="text" id="bookingSeatsInput" class="form-control" placeholder="e.g. A5, A6, A7" readonly required>
+                                            <span class="seats-preview-count" id="bookingSeatsCount">0 Seats</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Synchronization Control Option -->
+                                    <div class="sync-mode-selector-box">
+                                        <label class="form-label mb-2"><i class="fa-solid fa-shield-halved"></i> Concurrency Synchronization Mode:</label>
+                                        
+                                        <div class="radio-cards-grid">
+                                            <label class="radio-card selected-radio">
+                                                <input type="radio" name="syncMode" value="mutex" checked>
+                                                <div class="radio-content">
+                                                    <div class="radio-title-row">
+                                                        <i class="fa-solid fa-lock text-success"></i>
+                                                        <strong>Protected Mode (Mutex + Semaphore)</strong>
+                                                        <span class="badge-success">Safe</span>
+                                                    </div>
+                                                    <p class="radio-desc">Guarantees mutual exclusion and atomicity. Race conditions are 100% prevented.</p>
+                                                </div>
+                                            </label>
+
+                                            <label class="radio-card danger-radio">
+                                                <input type="radio" name="syncMode" value="unsafe">
+                                                <div class="radio-content">
+                                                    <div class="radio-title-row">
+                                                        <i class="fa-solid fa-triangle-exclamation text-warning"></i>
+                                                        <strong>Unprotected Mode (Simulate Race Hazard)</strong>
+                                                        <span class="badge-danger">Hazard Demo</span>
+                                                    </div>
+                                                    <p class="radio-desc">Skips lock acquisition to demonstrate Time-Of-Check to Time-Of-Use race bug.</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Form Action Buttons -->
+                                    <div class="form-actions-row">
+                                        <div class="price-breakdown">
+                                            <span class="breakdown-label">Total Payable:</span>
+                                            <h3 class="breakdown-val" id="formTotalAmount">₹0.00</h3>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-lg" id="submitBookingBtn">
+                                            <i class="fa-solid fa-circle-check"></i> Confirm Reservation
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Info & Instructions Card -->
+                        <div class="dashboard-card instructions-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fa-solid fa-circle-info"></i> How Group Booking Concurrency Works</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="concept-step">
+                                    <div class="step-num">1</div>
+                                    <div class="step-content">
+                                        <h5>Counting Semaphore Slot</h5>
+                                        <p>Limits concurrent database workers to prevent resource exhaustion and request storms.</p>
+                                    </div>
+                                </div>
+                                <div class="concept-step">
+                                    <div class="step-num">2</div>
+                                    <div class="step-content">
+                                        <h5>Mutual Exclusion (Mutex) Lock</h5>
+                                        <p>Only one thread enters the critical section to query seat availability and write records.</p>
+                                    </div>
+                                </div>
+                                <div class="concept-step">
+                                    <div class="step-num">3</div>
+                                    <div class="step-content">
+                                        <h5>Atomic Group Allocation</h5>
+                                        <p>All requested seats are committed in a single atomic transaction. If even one seat is taken, the transaction aborts cleanly.</p>
+                                    </div>
+                                </div>
+                                <div class="concept-step">
+                                    <div class="step-num">4</div>
+                                    <div class="step-content">
+                                        <h5>Immediate Release</h5>
+                                        <p>Mutex lock and Semaphore permits are guaranteed to release via try-finally blocks.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- G. SYNCHRONIZATION MONITOR & CONCURRENCY LAB -->
+                <!-- ================================================================= -->
+                <section class="sync-monitor-section" id="sync-monitor">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-microchip"></i> Synchronization Monitor & Concurrency Lab</h2>
+                            <p class="section-subtitle">Real-time multithreading telemetry, counting semaphore gauge, and race condition stress tester</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline" id="clearLogsBtn">
+                                <i class="fa-solid fa-trash-can"></i> Clear Logs
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Meters -->
+                    <div class="telemetry-meters-grid">
+                        <div class="meter-card">
+                            <div class="meter-icon"><i class="fa-solid fa-lock"></i></div>
+                            <div class="meter-info">
+                                <span class="meter-title">Mutex Lock Status</span>
+                                <h4 class="meter-status" id="meterMutexStatus">UNLOCKED (Ready)</h4>
+                            </div>
+                            <span class="meter-badge status-active">Safe</span>
+                        </div>
+
+                        <div class="meter-card">
+                            <div class="meter-icon"><i class="fa-solid fa-traffic-light"></i></div>
+                            <div class="meter-info">
+                                <span class="meter-title">Counting Semaphore</span>
+                                <h4 class="meter-status" id="meterSemaphoreSlots">3 / 3 Slots Free</h4>
+                            </div>
+                            <div class="semaphore-visual-dots" id="semaphoreDots">
+                                <span class="sem-dot active" title="Slot 1 Available"></span>
+                                <span class="sem-dot active" title="Slot 2 Available"></span>
+                                <span class="sem-dot active" title="Slot 3 Available"></span>
+                            </div>
+                        </div>
+
+                        <div class="meter-card">
+                            <div class="meter-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                            <div class="meter-info">
+                                <span class="meter-title">Conflicts Blocked</span>
+                                <h4 class="meter-status" id="meterConflictsBlocked">0</h4>
+                            </div>
+                            <span class="meter-badge badge-success">Protected</span>
+                        </div>
+
+                        <div class="meter-card">
+                            <div class="meter-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="meter-info">
+                                <span class="meter-title">Race Hazards Detected</span>
+                                <h4 class="meter-status text-danger" id="meterRaceCollisions">0</h4>
+                            </div>
+                            <span class="meter-badge badge-danger">Unsafe Writes</span>
+                        </div>
+                    </div>
+
+                    <!-- Concurrency Stress Test Simulator Panel -->
+                    <div class="dashboard-card stress-test-card">
+                        <div class="card-header">
+                            <div>
+                                <h4 class="card-title"><i class="fa-solid fa-bolt-lightning"></i> Multithreaded Race Condition Simulator</h4>
+                                <span class="card-subtitle">Launch concurrent Python threads targeting identical seats to demonstrate synchronization vs race hazard</span>
+                            </div>
+                            <div class="preset-pills">
+                                <span class="preset-label">Test Presets:</span>
+                                <button class="btn btn-sm btn-chip" id="presetSafe5">5 Threads + Mutex</button>
+                                <button class="btn btn-sm btn-chip btn-chip-warning" id="presetHazard5">5 Threads + Race Hazard</button>
+                                <button class="btn btn-sm btn-chip" id="presetSafe10">10 Threads Stress Test</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="stress-controls-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="simShowSelect">Target Cinema Show:</label>
+                                    <select id="simShowSelect" class="form-control custom-select">
+                                        <option value="1">Show 1: Inception (IMAX 2D)</option>
+                                        <option value="2">Show 2: Interstellar (Dolby Cinema)</option>
+                                        <option value="3">Show 3: Oppenheimer (70mm Experience)</option>
+                                        <option value="4">Show 4: The Dark Knight (Director's Cut)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="simSeatsInput"><i class="fa-solid fa-crosshairs"></i> Contested Target Seat:</label>
+                                    <input type="text" id="simSeatsInput" class="form-control" value="SIM-01">
+                                    <span class="input-helper"><i class="fa-solid fa-shield-halved text-success"></i> Isolated sandbox seat (SIM-01). Protects customer bookings!</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="simThreadsCount">Concurrent Threads (<span id="threadsCountVal">5</span>):</label>
+                                    <input type="range" id="simThreadsCount" class="custom-range" min="2" max="15" value="5">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Synchronization Strategy:</label>
+                                    <div class="toggle-switch-wrapper">
+                                        <label class="switch">
+                                            <input type="checkbox" id="simMutexToggle" checked>
+                                            <span class="slider round"></span>
+                                        </label>
+                                        <span class="toggle-status-text" id="simMutexLabel">Mutex Lock ENABLED (Safe)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stress-action-bar">
+                                <button class="btn btn-primary btn-lg btn-glow" id="runSimulationBtn">
+                                    <i class="fa-solid fa-play"></i> Run Multithreaded Simulation
+                                </button>
+                                <div class="sim-status-message" id="simStatusMsg">
+                                    Ready to fire concurrent threads using <code>threading.Barrier</code>
+                                </div>
+                            </div>
+
+                            <!-- Simulation Results Summary Banner -->
+                            <div class="sim-results-banner" id="simResultsBanner" style="display: none;">
+                                <div class="banner-stat">
+                                    <span class="banner-stat-title">Threads Launched</span>
+                                    <strong class="banner-stat-value" id="resThreadsLaunched">0</strong>
+                                </div>
+                                <div class="banner-stat">
+                                    <span class="banner-stat-title">Successful Bookings</span>
+                                    <strong class="banner-stat-value text-success" id="resSuccessful">0</strong>
+                                </div>
+                                <div class="banner-stat">
+                                    <span class="banner-stat-title">Conflicts Blocked</span>
+                                    <strong class="banner-stat-value text-warning" id="resConflicts">0</strong>
+                                </div>
+                                <div class="banner-stat">
+                                    <span class="banner-stat-title">Race Collisions</span>
+                                    <strong class="banner-stat-value text-danger" id="resCollisions">0</strong>
+                                </div>
+                                <div class="banner-stat">
+                                    <span class="banner-stat-title">Execution Time</span>
+                                    <strong class="banner-stat-value" id="resTimeMs">0 ms</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Concurrency Event Log Terminal -->
+                    <div class="dashboard-card log-terminal-card">
+                        <div class="card-header">
+                            <div class="terminal-header-left">
+                                <div class="terminal-dots">
+                                    <span class="terminal-dot red"></span>
+                                    <span class="terminal-dot yellow"></span>
+                                    <span class="terminal-dot green"></span>
+                                </div>
+                                <h4 class="card-title">Live Threading & Synchronization Event Feed</h4>
+                            </div>
+                            <div class="terminal-header-right">
+                                <span class="live-stream-badge"><span class="pulse-green"></span> STREAMING</span>
+                                <button class="btn btn-sm btn-subtle" id="toggleLogAutoScroll">
+                                    <i class="fa-solid fa-arrows-down-to-line"></i> Auto-Scroll: ON
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body terminal-body" id="syncLogsContainer">
+                            <div class="log-entry log-info">
+                                <span class="log-time">[12:00:00.000]</span>
+                                <span class="log-thread">[MainThread]</span>
+                                <span class="log-action">SYSTEM_ONLINE</span>
+                                <span class="log-msg">Concurrency engine initialized. Awaiting requests...</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- G2. DEDICATED OS CONCEPTS LAB (WEEK 2 & WEEK 3 DEMONSTRATION) -->
+                <!-- ================================================================= -->
+                <section class="os-lab-section" id="os-concepts-lab">
+                    <!-- Section Header -->
+                    <div class="section-header-row">
+                        <div>
+                            <div class="lab-title-badge">
+                                <span class="badge-gold"><i class="fa-solid fa-graduation-cap"></i> B.Tech CSE OS Demonstration</span>
+                                <span class="badge-tech"><i class="fa-solid fa-code-branch"></i> Week 2 Mutex &amp; Week 3 Semaphore</span>
+                            </div>
+                            <h2 class="section-title"><i class="fa-solid fa-flask-vial text-warning"></i> OS Concepts Lab – Interactive Platform</h2>
+                            <p class="section-subtitle">Real-time educational demonstrations of Multithreading, Concurrency, Race Condition Hazards, Critical Sections, Mutex Locks, Counting Semaphores, Thread Joining, and Shared Memory Management mapped directly to CinemaPro.</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline" id="labResetBtn" title="Reset all simulation seats and lab monitor state">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Lab Test Beds
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Concept Navigator Pills -->
+                    <div class="lab-nav-pills" id="labNavPills">
+                        <button class="lab-pill active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All Modules</button>
+                        <button class="lab-pill" data-filter="workflow"><i class="fa-solid fa-diagram-project"></i> 3-Stage Workflow</button>
+                        <button class="lab-pill" data-filter="monitor"><i class="fa-solid fa-heart-pulse"></i> Activity Monitor</button>
+                        <button class="lab-pill" data-filter="concept-a"><i class="fa-solid fa-users"></i> A. Multithreading</button>
+                        <button class="lab-pill" data-filter="concept-b"><i class="fa-solid fa-bolt"></i> B. Concurrency</button>
+                        <button class="lab-pill" data-filter="concept-c"><i class="fa-solid fa-triangle-exclamation"></i> C. Race Hazard</button>
+                        <button class="lab-pill" data-filter="concept-d"><i class="fa-solid fa-door-closed"></i> D. Critical Section</button>
+                        <button class="lab-pill" data-filter="concept-e"><i class="fa-solid fa-lock"></i> E. Mutex Lock</button>
+                        <button class="lab-pill" data-filter="concept-f"><i class="fa-solid fa-traffic-light"></i> F. Semaphore</button>
+                        <button class="lab-pill" data-filter="concept-g"><i class="fa-solid fa-link"></i> G. Thread Join</button>
+                        <button class="lab-pill" data-filter="concept-h"><i class="fa-solid fa-database"></i> H. Shared Data</button>
+                        <button class="lab-pill" data-filter="comparison"><i class="fa-solid fa-scale-balanced"></i> Comparison Matrix</button>
+                    </div>
+
+                    <!-- ============================================================= -->
+                    <!-- 1. REAL-TIME ACTIVITY MONITOR PANEL -->
+                    <!-- ============================================================= -->
+                    <div class="lab-module-card lab-monitor-card" id="module-monitor">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <i class="fa-solid fa-heart-pulse text-danger"></i>
+                                <div>
+                                    <h4 class="card-title">Real-Time Concurrency &amp; Activity Monitor</h4>
+                                    <span class="card-subtitle">Live telemetry stream capturing active threads, critical section occupancy, lock variables, and waiting queues</span>
+                                </div>
+                            </div>
+                            <span class="live-stream-badge"><span class="pulse-green"></span> LIVE TELEMETRY</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="monitor-grid">
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-id-badge"></i> Active Thread &amp; Name</span>
+                                    <h5 class="mon-val text-primary" id="monThreadName">None (IDLE)</h5>
+                                    <span class="mon-sub" id="monThreadId">Thread ID: -</span>
+                                </div>
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-spinner"></i> Thread Lifecycle State</span>
+                                    <h5 class="mon-val" id="monThreadStatus"><span class="badge-subtle">IDLE</span></h5>
+                                    <span class="mon-sub">Waiting &bull; Running &bull; Completed</span>
+                                </div>
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-crosshairs"></i> Target Seat Requested</span>
+                                    <h5 class="mon-val text-warning" id="monTargetSeat">None</h5>
+                                    <span class="mon-sub">Contested Cinema Seat</span>
+                                </div>
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-lock"></i> Mutex Status (threading.Lock)</span>
+                                    <h5 class="mon-val text-success" id="monMutexState">UNLOCKED</h5>
+                                    <span class="mon-sub">Binary Mutual Exclusion</span>
+                                </div>
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-traffic-light"></i> Semaphore Capacity</span>
+                                    <h5 class="mon-val text-info" id="monSemState">3 / 3 Permits Free</h5>
+                                    <span class="mon-sub">Permit Pool Available</span>
+                                </div>
+                                <div class="mon-tile">
+                                    <span class="mon-label"><i class="fa-solid fa-door-open"></i> Critical Section Occupant</span>
+                                    <h5 class="mon-val" id="monCriticalSection">IDLE (Empty)</h5>
+                                    <span class="mon-sub">Exclusive Seat Reservation Code</span>
+                                </div>
+                            </div>
+
+                            <div class="monitor-footer-row">
+                                <div class="queue-status-box">
+                                    <span class="queue-label"><i class="fa-solid fa-people-line"></i> Waiting Thread Queue:</span>
+                                    <div class="queue-pills-list" id="monWaitingQueue">
+                                        <span class="queue-chip empty-chip">No threads waiting in queue</span>
+                                    </div>
+                                </div>
+                                <div class="latest-event-box">
+                                    <span class="event-label"><i class="fa-solid fa-bullhorn"></i> Last Booking Outcome:</span>
+                                    <span class="event-text" id="monLastResult">System idle. Ready for laboratory tests.</span>
+                                    <span class="event-time" id="monTimestamp">--:--:--.---</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================================= -->
+                    <!-- 2. THREE-STAGE INTERACTIVE WORKFLOW DIAGRAM -->
+                    <!-- ============================================================= -->
+                    <div class="lab-module-card workflow-card" id="module-workflow">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <i class="fa-solid fa-diagram-project text-primary"></i>
+                                <div>
+                                    <h4 class="card-title">Three-Stage Interactive System Workflow Diagram</h4>
+                                    <span class="card-subtitle">Click any stage card to inspect theoretical OS principles, internal execution flow, and exact Python backend source code</span>
+                                </div>
+                            </div>
+                            <span class="badge-subtle"><i class="fa-solid fa-hand-pointer"></i> Click Any Stage Card</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="workflow-steps-container">
+                                <!-- Stage 1 -->
+                                <div class="workflow-step-card active" data-stage="1" id="wfStep1">
+                                    <div class="step-badge">STAGE 1</div>
+                                    <div class="step-icon-wrap"><i class="fa-solid fa-shield-halved"></i></div>
+                                    <h5 class="step-title">Synchronization Gate</h5>
+                                    <p class="step-summary">Incoming HTTP request arrives &bull; Spawns worker thread &bull; Acquires <code>Mutex</code> or <code>Semaphore</code> &bull; Throttles burst traffic &bull; Blocks concurrent racers.</p>
+                                    <div class="step-tags">
+                                        <span class="tag">threading.Lock</span>
+                                        <span class="tag">threading.Semaphore</span>
+                                        <span class="tag">Mutual Exclusion</span>
+                                    </div>
+                                </div>
+
+                                <!-- Arrow 1 -->
+                                <div class="workflow-arrow">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                    <span class="arrow-caption">Permit Granted</span>
+                                </div>
+
+                                <!-- Stage 2 -->
+                                <div class="workflow-step-card" data-stage="2" id="wfStep2">
+                                    <div class="step-badge">STAGE 2</div>
+                                    <div class="step-icon-wrap"><i class="fa-solid fa-database"></i></div>
+                                    <h5 class="step-title">Database Processing</h5>
+                                    <p class="step-summary">Critical Section isolation &bull; Query SQLite seat availability &bull; Enforce group booking atomicity &bull; Commit transaction &bull; Release lock in <code>finally:</code> block.</p>
+                                    <div class="step-tags">
+                                        <span class="tag">Critical Section</span>
+                                        <span class="tag">Atomic Commit</span>
+                                        <span class="tag">ACID Guarantee</span>
+                                    </div>
+                                </div>
+
+                                <!-- Arrow 2 -->
+                                <div class="workflow-arrow">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                    <span class="arrow-caption">Data Committed</span>
+                                </div>
+
+                                <!-- Stage 3 -->
+                                <div class="workflow-step-card" data-stage="3" id="wfStep3">
+                                    <div class="step-badge">STAGE 3</div>
+                                    <div class="step-icon-wrap"><i class="fa-solid fa-desktop"></i></div>
+                                    <h5 class="step-title">Website Real-Time Update</h5>
+                                    <p class="step-summary">Return JSON confirmation &bull; Generate unique ticket ref &bull; Update seat layout grid to Booked (Red) &bull; Increment live revenue &bull; Push telemetry.</p>
+                                    <div class="step-tags">
+                                        <span class="tag">UI Synchronization</span>
+                                        <span class="tag">Ticket Receipt</span>
+                                        <span class="tag">Audit Trail</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Stage Inspector Drawer -->
+                            <div class="stage-inspector" id="stageInspector">
+                                <div class="inspector-header">
+                                    <div class="inspector-title-group">
+                                        <i class="fa-solid fa-code text-warning"></i>
+                                        <h5 id="inspectorTitle">Stage 1: Synchronization Gate Details</h5>
+                                    </div>
+                                    <button class="btn btn-sm btn-subtle" id="closeInspectorBtn"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <div class="inspector-body" id="inspectorContent">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================================= -->
+                    <!-- 3. THE 8 DEDICATED OS CONCEPT MODULES (A - H) -->
+                    <!-- ============================================================= -->
+                    <div class="concept-modules-grid">
+
+                        <!-- CONCEPT A: THREADS & MULTITHREADING -->
+                        <div class="concept-card" id="module-concept-a">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter">A</span>
+                                    <div>
+                                        <h4 class="concept-name">Threads and Multithreading</h4>
+                                        <span class="concept-subtitle">Simultaneous Customer Execution with Independent Program Counters</span>
+                                    </div>
+                                </div>
+                                <span class="badge-concept">Foundation</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">A thread is the smallest sequence of programmed instructions that can be managed independently by an operating system scheduler. Multithreading allows a single process to execute multiple execution flows concurrently, sharing the process's code, data, and resources while maintaining individual stacks and registers.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">In a commercial cinema ticketing platform, thousands of customers attempt to book tickets simultaneously. Single-threaded architectures force customers to wait in a linear queue, causing unacceptable latency and server timeouts. Multithreading allows each customer to be served in their own thread concurrently.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">The OS kernel allocates a Thread Control Block (TCB) for each thread containing its Thread ID, Program Counter (PC), CPU registers, and stack pointer. Threads share the process heap and open file descriptors. The OS scheduler preempts and time-slices CPU cores between threads.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">When customers initiate ticket bookings, CinemaPro spawns separate Python threads (<code>Customer-1</code>, <code>Customer-2</code>, <code>Customer-3</code>) via Python's <code>threading.Thread(target=process_booking)</code>.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Live Interactive Demo Area -->
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-primary" id="runThreadsDemoBtn">
+                                            <i class="fa-solid fa-play"></i> Launch Multi-Customer Threads
+                                        </button>
+                                        <button class="btn btn-outline" id="resetThreadsDemoBtn">
+                                            <i class="fa-solid fa-rotate-left"></i> Reset
+                                        </button>
+                                        <span class="demo-hint"><i class="fa-solid fa-circle-info"></i> Spawns 3 Python threads concurrently</span>
+                                    </div>
+
+                                    <!-- Visual Thread Lifecycles -->
+                                    <div class="threads-lifecycle-visual" id="threadsLifecycleVisual">
+                                        <div class="thread-node" id="nodeThread1">
+                                            <div class="node-icon"><i class="fa-solid fa-user"></i></div>
+                                            <div class="node-info">
+                                                <span class="node-name">Customer-1</span>
+                                                <span class="node-state badge-subtle">IDLE</span>
+                                            </div>
+                                            <div class="node-progress"><div class="bar"></div></div>
+                                        </div>
+                                        <div class="thread-node" id="nodeThread2">
+                                            <div class="node-icon"><i class="fa-solid fa-user"></i></div>
+                                            <div class="node-info">
+                                                <span class="node-name">Customer-2</span>
+                                                <span class="node-state badge-subtle">IDLE</span>
+                                            </div>
+                                            <div class="node-progress"><div class="bar"></div></div>
+                                        </div>
+                                        <div class="thread-node" id="nodeThread3">
+                                            <div class="node-icon"><i class="fa-solid fa-user"></i></div>
+                                            <div class="node-info">
+                                                <span class="node-name">Customer-3</span>
+                                                <span class="node-state badge-subtle">IDLE</span>
+                                            </div>
+                                            <div class="node-progress"><div class="bar"></div></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Live Logs -->
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar"><span>Thread Execution Logs</span></div>
+                                        <div class="terminal-feed" id="threadsDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to spawn customer threads. Click Launch.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> Multithreading provides responsiveness by overlapping I/O operations and database queries, but introduces shared memory synchronization challenges.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT B: CONCURRENCY -->
+                        <div class="concept-card" id="module-concept-b">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter">B</span>
+                                    <div>
+                                        <h4 class="concept-name">Concurrency &amp; Interleaving</h4>
+                                        <span class="concept-subtitle">Simultaneous Incoming Requests &amp; Non-Deterministic Execution</span>
+                                    </div>
+                                </div>
+                                <span class="badge-concept">Execution</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">Concurrency is the execution of multiple instruction sequences at the same time. On a single-core CPU, concurrency is achieved through interleaving via rapid context switches. On multi-core CPUs, concurrency is achieved through true parallel hardware execution.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">When online bookings open for premier shows (e.g., Oppenheimer 70mm), hundreds of booking requests hit the web server in the exact same millisecond. The server must handle all incoming connections concurrently rather than serializing them.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">The OS CPU scheduler uses preemptive algorithms (e.g., Round Robin, Completely Fair Scheduler). A timer interrupt triggers context switching, swapping CPU register state between threads without warning. Consequently, instruction order across threads is non-deterministic.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">CinemaPro uses <code>threading.Barrier(N)</code> to hold multiple customer threads until all are ready, releasing them simultaneously to simulate realistic concurrent burst traffic against the booking endpoint.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-primary" id="runConcurrencyDemoBtn">
+                                            <i class="fa-solid fa-bolt"></i> Fire 4 Concurrent Requests via Barrier
+                                        </button>
+                                        <span class="demo-hint"><i class="fa-solid fa-circle-info"></i> Synchronized release at exact same millisecond</span>
+                                    </div>
+
+                                    <!-- Barrier Visualizer -->
+                                    <div class="barrier-visualizer-box" id="concurrencyBarrierVisual">
+                                        <div class="barrier-line">
+                                            <span class="barrier-badge"><i class="fa-solid fa-flag-checkered"></i> threading.Barrier(4)</span>
+                                        </div>
+                                        <div class="concurrent-threads-row">
+                                            <div class="c-thread-chip" id="cThread1">Req-1 (Elena)</div>
+                                            <div class="c-thread-chip" id="cThread2">Req-2 (Marcus)</div>
+                                            <div class="c-thread-chip" id="cThread3">Req-3 (Guna)</div>
+                                            <div class="c-thread-chip" id="cThread4">Req-4 (Sophia)</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar"><span>Interleaved Arrival &amp; Processing Order</span></div>
+                                        <div class="terminal-feed" id="concurrencyDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to test concurrency barrier. Click Fire.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> Because the CPU scheduler is non-deterministic, we cannot rely on timing to prevent data corruption. Synchronization primitives are mandatory.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT C: RACE CONDITION (WITHOUT MUTEX) -->
+                        <div class="concept-card hazard-card" id="module-concept-c">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter text-danger">C</span>
+                                    <div>
+                                        <h4 class="concept-name text-danger">Race Condition – Without Mutex</h4>
+                                        <span class="concept-subtitle">Time-Of-Check to Time-Of-Use (TOCTOU) Flaw &amp; Double-Booking Hazard</span>
+                                    </div>
+                                </div>
+                                <span class="badge-danger">Unsynchronized Hazard</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="hazard-notice-banner">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <div>
+                                        <strong>EDUCATIONAL HAZARD DEMONSTRATION ONLY:</strong>
+                                        <span> Runs without synchronization on isolated sandbox seat <code>SIM-RACE</code>. Real customer seats in the database are 100% protected.</span>
+                                    </div>
+                                </div>
+
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">A race condition is an undesirable situation where the system's output or final state depends on the uncoordinated timing, interleaving, or sequence of other uncontrollable events. It arises when two or more concurrent threads access shared data and at least one attempts to write.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required to Understand</div>
+                                        <div class="breakdown-content">Without seeing a race condition in action, students cannot appreciate why Mutex locks are worth their synchronization overhead. Double-booking is the textbook real-world cinema catastrophe caused directly by a race condition.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally (TOCTOU)</div>
+                                        <div class="breakdown-content">
+                                            <strong>Time-Of-Check to Time-Of-Use (TOCTOU) gap:</strong><br>
+                                            1. Thread A checks database: <code>is_booked == 0</code> (Seat is available).<br>
+                                            2. Context switch occurs. Thread A pauses for payment verification.<br>
+                                            3. Thread B checks database: <code>is_booked == 0</code> (Seat still looks available!).<br>
+                                            4. Thread B books seat and writes <code>is_booked = 1</code>.<br>
+                                            5. Thread A wakes up, assumes seat is still free based on its earlier check, and writes <code>is_booked = 1</code>.<br>
+                                            <strong>Outcome:</strong> Two confirmed tickets issued for the exact same seat!
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">CinemaPro provides an un-synchronized educational simulation endpoint (<code>POST /api/lab/race-demo</code>) that bypasses locks, introduces an artificial context switch delay (0.05s), and registers double-booking collisions.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-danger" id="runRaceDemoBtn">
+                                            <i class="fa-solid fa-triangle-exclamation"></i> Trigger Race Hazard on SIM-RACE
+                                        </button>
+                                        <span class="demo-hint text-danger"><i class="fa-solid fa-circle-radiation"></i> Unsynchronized execution</span>
+                                    </div>
+
+                                    <!-- Overlapping Timeline Visualizer -->
+                                    <div class="race-timeline-visual" id="raceTimelineVisual">
+                                        <div class="timeline-row">
+                                            <span class="t-name">Thread-A (Elena):</span>
+                                            <div class="t-bar step-check">Check: Free (0)</div>
+                                            <div class="t-bar step-sleep">Context Switch / Sleep (TOCTOU Gap)</div>
+                                            <div class="t-bar step-overwrite">Write Booked! (DOUBLE-BOOK)</div>
+                                        </div>
+                                        <div class="timeline-row">
+                                            <span class="t-name">Thread-B (Marcus):</span>
+                                            <div class="t-bar step-idle">Wait</div>
+                                            <div class="t-bar step-check">Check: Free (0)</div>
+                                            <div class="t-bar step-write">Write Booked!</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar text-danger"><span>Race Hazard Collision Feed</span></div>
+                                        <div class="terminal-feed" id="raceDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to demonstrate race condition. Click Trigger.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box viva-danger">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> A check-then-act sequence on shared memory without an atomic lock creates a TOCTOU race window, leading to data corruption and double-allocation.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT D: CRITICAL SECTION -->
+                        <div class="concept-card" id="module-concept-d">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter">D</span>
+                                    <div>
+                                        <h4 class="concept-name">Critical Section Architecture</h4>
+                                        <span class="concept-subtitle">Dijkstra's Synchronization Rules: Entry, Critical, Exit &amp; Remainder Sections</span>
+                                    </div>
+                                </div>
+                                <span class="badge-concept">Architecture</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">A critical section is a piece of code that accesses shared resources (such as common variables, database records, or hardware devices) that must not be accessed concurrently by more than one thread of execution.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">To prevent data corruption, any solution to the critical section problem must satisfy Dijkstra's three requirements: <strong>1. Mutual Exclusion:</strong> If thread A is in CS, no other thread can enter. <strong>2. Progress:</strong> If no thread is in CS, selection cannot be postponed indefinitely. <strong>3. Bounded Waiting:</strong> A bound must exist on the number of times other threads enter before a waiting thread enters.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">
+                                            Every critical section protocol is partitioned into 4 distinct phases:<br>
+                                            <code>1. Entry Section:</code> Requests permission to enter (e.g., <code>lock.acquire()</code>).<br>
+                                            <code>2. Critical Section:</code> Reads and updates shared seat records.<br>
+                                            <code>3. Exit Section:</code> Relinquishes ownership and signals waiters (e.g., <code>lock.release()</code>).<br>
+                                            <code>4. Remainder Section:</code> Executes independent code (e.g., formatting invoice, sending email).
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">In <code>app.py</code>, the SQL query verifying seat availability followed immediately by <code>UPDATE seats SET is_booked = 1</code> is the protected Critical Section.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-primary" id="runCriticalSectionDemoBtn">
+                                            <i class="fa-solid fa-door-closed"></i> Animate 4-Phase Critical Section Flow
+                                        </button>
+                                        <span class="demo-hint"><i class="fa-solid fa-circle-info"></i> Watch thread step through Entry &rarr; CS &rarr; Exit &rarr; Remainder</span>
+                                    </div>
+
+                                    <!-- 4-Phase Critical Section Visual Room -->
+                                    <div class="cs-rooms-container" id="csRoomsVisual">
+                                        <div class="cs-room" id="csRoomEntry">
+                                            <div class="room-title">1. Entry Section</div>
+                                            <div class="room-desc"><code>lock.acquire()</code></div>
+                                            <div class="room-occupants" id="csEntryOccupants">
+                                                <span class="chip-idle">Queue ready</span>
+                                            </div>
+                                        </div>
+                                        <div class="cs-room cs-vault" id="csRoomCritical">
+                                            <div class="room-title"><i class="fa-solid fa-lock"></i> 2. Critical Section</div>
+                                            <div class="room-desc">Exclusive Seat Update</div>
+                                            <div class="room-occupants" id="csCriticalOccupants">
+                                                <span class="chip-idle">No thread inside</span>
+                                            </div>
+                                        </div>
+                                        <div class="cs-room" id="csRoomExit">
+                                            <div class="room-title">3. Exit Section</div>
+                                            <div class="room-desc"><code>lock.release()</code></div>
+                                            <div class="room-occupants" id="csExitOccupants">
+                                                <span class="chip-idle">Clean exit</span>
+                                            </div>
+                                        </div>
+                                        <div class="cs-room" id="csRoomRemainder">
+                                            <div class="room-title">4. Remainder Section</div>
+                                            <div class="room-desc">Ticket Receipt Gen</div>
+                                            <div class="room-occupants" id="csRemainderOccupants">
+                                                <span class="chip-idle">Idle</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar"><span>Phase Transition Log</span></div>
+                                        <div class="terminal-feed" id="csDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to trace critical section phases. Click Animate.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> Keeping the critical section as small as possible minimizes thread contention and maximizes system throughput.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT E: MUTEX LOCK (WITH MUTEX - WEEK 2 PDF) -->
+                        <div class="concept-card secure-card" id="module-concept-e">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter text-success">E</span>
+                                    <div>
+                                        <h4 class="concept-name text-success">Mutex Lock – With Mutex (Week 2 PDF)</h4>
+                                        <span class="concept-subtitle">Real Python <code>threading.Lock()</code> Guaranteeing Mutual Exclusion</span>
+                                    </div>
+                                </div>
+                                <span class="badge-success">Week 2 PDF Core</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">A Mutex (Mutual Exclusion) is a binary synchronization primitive used to protect shared data from simultaneous access. Only one thread can hold the lock at any point in time. Any other thread attempting to acquire the lock is blocked and suspended until the current owner releases it.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">Mutex is the fundamental solution to race conditions. By ensuring that only one customer thread can execute the seat check and reservation update, double-bookings are guaranteed to be 100% mathematically impossible.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">
+                                            In Python, <code>threading.Lock()</code> is implemented at the C-extension layer using OS-level mutexes (e.g., Windows CRITICAL_SECTION or POSIX pthread_mutex).<br>
+                                            &bull; <code>acquire(blocking=True):</code> If state is UNLOCKED, sets state to LOCKED and caller continues immediately. If state is LOCKED, thread transitions from RUNNING to BLOCKED and is placed in the lock's wait queue.<br>
+                                            &bull; <code>release():</code> Sets state to UNLOCKED and signals the OS kernel to wake the first thread from the wait queue.<br>
+                                            &bull; <code>with lock:</code> Context manager syntax guaranteeing release via internal <code>__enter__</code> and <code>__exit__</code> (try-finally).
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">In <code>app.py</code>, CinemaPro instantiates <code>booking_mutex = threading.Lock()</code>. Every live booking route wraps database operations with <code>with booking_mutex:</code>.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-primary" id="runMutexDemoBtn">
+                                            <i class="fa-solid fa-lock"></i> Test 5 Competing Threads on SIM-MUTEX
+                                        </button>
+                                        <span class="demo-hint text-success"><i class="fa-solid fa-shield-check"></i> Python threading.Lock() active</span>
+                                    </div>
+
+                                    <!-- Mutex Shielded Lock Visualizer -->
+                                    <div class="mutex-visual-box" id="mutexVisualBox">
+                                        <div class="lock-graphic">
+                                            <i class="fa-solid fa-lock text-success" id="mutexLockIcon"></i>
+                                            <span class="lock-state-label" id="mutexVisualState">LOCK AVAILABLE</span>
+                                        </div>
+                                        <div class="competing-threads-list" id="mutexCompetitorsList">
+                                            <div class="c-node">Thread-1</div>
+                                            <div class="c-node">Thread-2</div>
+                                            <div class="c-node">Thread-3</div>
+                                            <div class="c-node">Thread-4</div>
+                                            <div class="c-node">Thread-5</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar text-success"><span>Mutex Acquisition &amp; Safe Serialized Feed</span></div>
+                                        <div class="terminal-feed" id="mutexDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to test Mutex lock. Click Test.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box viva-success">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> With Mutex, exactly 1 thread wins the seat, the remaining 4 threads are safely rejected with zero collisions, preserving 100% database integrity.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT F: COUNTING SEMAPHORE (WEEK 3 PDF) -->
+                        <div class="concept-card" id="module-concept-f">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter text-info">F</span>
+                                    <div>
+                                        <h4 class="concept-name text-info">Counting Semaphore (Week 3 PDF)</h4>
+                                        <span class="concept-subtitle">Real Python <code>threading.Semaphore(N)</code> with Configurable Capacity</span>
+                                    </div>
+                                </div>
+                                <span class="badge-info">Week 3 PDF Core</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">A Semaphore is a protected variable or abstract data type that constitutes the classic method for restricting access to shared resources in a multi-processing environment. A Counting Semaphore maintains an integer counter initialized to $N$, representing the total number of available permits.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">While a Mutex permits only 1 thread at a time, a cinema backend can safely handle $N$ concurrent transactions across different screens without overloading SQLite or saturating server connection pools. Semaphores provide controlled resource throttling.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">
+                                            A counting semaphore consists of an integer counter and a wait queue:<br>
+                                            &bull; <code>wait() / acquire():</code> Decrements the counter. If counter $\ge 0$, thread proceeds. If counter $< 0$, thread blocks and enters the semaphore wait queue.<br>
+                                            &bull; <code>signal() / release():</code> Increments counter. If counter $\le 0$, wakes a waiting thread from the queue.<br>
+                                            &bull; When initialized with $N=1$, it functions as a Binary Semaphore (equivalent to a Mutex).
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">CinemaPro backend initializes <code>concurrency_semaphore = threading.Semaphore(3)</code>. Every incoming booking request must acquire a permit before beginning its checkout transaction.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <div class="control-subgroup">
+                                            <label for="labSemCapacitySelect" class="form-label-inline">Permit Capacity ($N$):</label>
+                                            <select id="labSemCapacitySelect" class="form-control form-control-sm form-select-inline">
+                                                <option value="1">1 Permit (Binary Semaphore)</option>
+                                                <option value="2" selected>2 Permits (Dual Slot)</option>
+                                                <option value="3">3 Permits (Triple Slot - Default)</option>
+                                                <option value="4">4 Permits (Quad Slot)</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-primary" id="runSemaphoreDemoBtn">
+                                            <i class="fa-solid fa-traffic-light"></i> Launch 6 Wave Requests
+                                        </button>
+                                        <span class="demo-hint text-info"><i class="fa-solid fa-gauge-high"></i> Throttled wave processing</span>
+                                    </div>
+
+                                    <!-- Permit Slots Visualizer -->
+                                    <div class="semaphore-visual-box" id="semaphoreVisualBox">
+                                        <div class="permit-slots-container" id="semPermitSlotsContainer">
+                                            <!-- Populated dynamically via JS -->
+                                        </div>
+                                        <div class="queued-waiters-container" id="semQueuedWaitersContainer">
+                                            <span class="queue-title">Queued Threads:</span>
+                                            <div class="waiters-chips" id="semWaitersChips">
+                                                <span class="chip-empty">No threads waiting</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar text-info"><span>Semaphore Permit Throttling Feed</span></div>
+                                        <div class="terminal-feed" id="semaphoreDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to test Counting Semaphore. Click Launch.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box viva-info">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> A Counting Semaphore allows up to $N$ concurrent threads into the server, queuing thread $N+1$ until a permit is freed, thereby preventing denial-of-service server crashes.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT G: THREAD JOINING -->
+                        <div class="concept-card" id="module-concept-g">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter">G</span>
+                                    <div>
+                                        <h4 class="concept-name">Thread Joining (thread.join())</h4>
+                                        <span class="concept-subtitle">Parent Process Synchronization &amp; Aggregating Parallel Results</span>
+                                    </div>
+                                </div>
+                                <span class="badge-concept">Barrier Sync</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">Thread joining is a synchronization mechanism where one thread pauses its execution and blocks until one or more target threads finish executing and terminate. In POSIX and Python, this is accomplished via <code>pthread_join()</code> or <code>thread.join()</code>.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">When a parent process delegates subtasks (such as calculating group seat discounts, validating credit card payments, and reserving seats in parallel), it cannot calculate the final total or issue a receipt until all worker threads complete. Calling <code>.join()</code> prevents race conditions on aggregate results.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">Calling <code>t.join()</code> suspends the calling thread. The OS transitions the caller to the BLOCKED state and stores it in the target thread's join queue. When the target thread terminates, its exit handler cleans up its TCB and signals the OS to wake all joined threads back to the READY state.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">CinemaPro backend spawns 3 parallel workers for group booking validation (Member-A, Member-B, Member-C), calls <code>t.join()</code> on each, and then compiles the final aggregated confirmation receipt.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-primary" id="runThreadJoinDemoBtn">
+                                            <i class="fa-solid fa-link"></i> Launch 3 Workers &amp; Execute thread.join()
+                                        </button>
+                                        <span class="demo-hint"><i class="fa-solid fa-circle-info"></i> Blocks main thread until all workers finish</span>
+                                    </div>
+
+                                    <!-- Thread Join Visualizer -->
+                                    <div class="join-visual-box" id="joinVisualBox">
+                                        <div class="main-thread-bar" id="mainThreadBar">
+                                            <span class="m-badge"><i class="fa-solid fa-server"></i> Main Request Handler</span>
+                                            <span class="m-state" id="mainThreadState">IDLE</span>
+                                        </div>
+                                        <div class="join-workers-grid">
+                                            <div class="worker-pill" id="worker1Pill">Worker-1: Validate Seats</div>
+                                            <div class="worker-pill" id="worker2Pill">Worker-2: Calculate Pricing</div>
+                                            <div class="worker-pill" id="worker3Pill">Worker-3: Audit Telemetry</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="demo-terminal-box">
+                                        <div class="terminal-bar"><span>Thread Join &amp; Barrier Log</span></div>
+                                        <div class="terminal-feed" id="joinDemoLogs">
+                                            <div class="t-line text-muted">[System] Ready to demonstrate thread joining. Click Launch.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="viva-takeaway-box">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> <code>thread.join()</code> guarantees barrier synchronization, ensuring that parallel computations are fully finalized before proceeding to dependent steps.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONCEPT H: SHARED DATA & RESOURCE MANAGEMENT -->
+                        <div class="concept-card" id="module-concept-h">
+                            <div class="concept-header">
+                                <div class="concept-title-group">
+                                    <span class="concept-letter">H</span>
+                                    <div>
+                                        <h4 class="concept-name">Shared Data &amp; Resource Management</h4>
+                                        <span class="concept-subtitle">ACID Atomicity, SQLite Concurrency &amp; Memory State Coherency</span>
+                                    </div>
+                                </div>
+                                <span class="badge-concept">Data Integrity</span>
+                            </div>
+                            <div class="concept-body">
+                                <div class="breakdown-accordion">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-book text-primary"></i> 1. Formal Definition</div>
+                                        <div class="breakdown-content">Shared data is information stored in shared memory address spaces or persistent storage that is readable and writable by multiple concurrent processes or threads. Resource management governs access protocols to prevent dirty reads, torn writes, and deadlocks.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-circle-question text-warning"></i> 2. Why It Is Required</div>
+                                        <div class="breakdown-content">In group ticket bookings where 3 or 4 seats are reserved together (e.g., A1, A2, A3), the system must guarantee <strong>Atomicity</strong>: either all requested seats are booked, or none are booked. A partial failure must cleanly roll back to prevent orphaned seat allocations.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-gears text-info"></i> 3. How It Works Internally</div>
+                                        <div class="breakdown-content">CinemaPro uses Write-Ahead Logging (WAL) and explicit SQLite database transactions. Combined with Python memory synchronization locks, it ensures that memory mirrors the disk state consistently without cache coherency anomalies.</div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-title"><i class="fa-solid fa-film text-success"></i> 4. CinemaPro Usage</div>
+                                        <div class="breakdown-content">CinemaPro maintains shared memory in <code>lab_monitor_state</code> and shared persistent state in SQLite tables <code>seats</code>, <code>shows</code>, <code>bookings</code>, and <code>simulation_seats</code>.</div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-interactive-box">
+                                    <div class="demo-control-bar">
+                                        <button class="btn btn-outline" id="inspectSharedDataBtn">
+                                            <i class="fa-solid fa-database"></i> Inspect Live Shared Memory &amp; Sandbox Seats
+                                        </button>
+                                        <span class="demo-hint"><i class="fa-solid fa-circle-info"></i> Query live state of simulation test seats</span>
+                                    </div>
+
+                                    <!-- Shared Memory Snapshot Table -->
+                                    <div class="shared-memory-table-wrap">
+                                        <table class="table-compact" id="sharedSeatsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Seat Code</th>
+                                                    <th>Assigned Module</th>
+                                                    <th>Status</th>
+                                                    <th>Booked By</th>
+                                                    <th>Last Action Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="sharedSeatsTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">Click Inspect to query shared memory state...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="viva-takeaway-box">
+                                        <strong><i class="fa-solid fa-graduation-cap"></i> Viva Takeaway:</strong> Atomicity and consistency require pairing Python-level thread locks with database-level ACID transactions to ensure zero state divergence.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ============================================================= -->
+                    <!-- 4. SIDE-BY-SIDE COMPARISON DASHBOARD -->
+                    <!-- ============================================================= -->
+                    <div class="lab-module-card comparison-card" id="module-comparison">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <i class="fa-solid fa-scale-balanced text-warning"></i>
+                                <div>
+                                    <h4 class="card-title">Side-by-Side Synchronization Comparison Matrix</h4>
+                                    <span class="card-subtitle">Direct empirical comparison between Unsynchronized (Race Hazard), Mutex Lock (Week 2), and Counting Semaphore (Week 3)</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline" id="refreshComparisonBtn">
+                                <i class="fa-solid fa-rotate"></i> Refresh Matrix
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Live Comparative Stats Grid -->
+                            <div class="comp-stats-grid">
+                                <!-- Card 1: Without Mutex -->
+                                <div class="comp-stat-card card-danger">
+                                    <div class="comp-card-badge">1. Without Mutex</div>
+                                    <h5 class="comp-stat-title">Unsynchronized Mode</h5>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-calculator"></i> Total Runs:</span>
+                                        <strong id="cmpUnsafeRuns">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-users"></i> Number of Requests:</span>
+                                        <strong id="cmpNoMutexRequests">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-check"></i> Successful Operations:</span>
+                                        <strong class="text-danger" id="cmpNoMutexSuccess">0 (Unsafe)</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-xmark"></i> Rejected Operations:</span>
+                                        <strong id="cmpNoMutexRejected">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-triangle-exclamation"></i> Race Collisions:</span>
+                                        <strong class="text-danger" id="cmpUnsafeCollisions">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-people-line"></i> Waiting Threads:</span>
+                                        <strong id="cmpNoMutexWaiting">0 (No Wait Queue)</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-shield-halved"></i> Synchronization Status:</span>
+                                        <span class="badge-danger" id="cmpNoMutexSyncStatus">Unprotected (Hazard)</span>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-chair"></i> Final Seat Availability:</span>
+                                        <strong class="text-danger font-mono" id="cmpNoMutexFinalSeats">Contested / Overwritten</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2: With Mutex Lock -->
+                                <div class="comp-stat-card card-success">
+                                    <div class="comp-card-badge">2. With Mutex (Week 2)</div>
+                                    <h5 class="comp-stat-title">threading.Lock()</h5>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-calculator"></i> Total Runs:</span>
+                                        <strong id="cmpMutexRuns">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-users"></i> Number of Requests:</span>
+                                        <strong id="cmpMutexRequests">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-check"></i> Successful Operations:</span>
+                                        <strong class="text-success" id="cmpMutexSuccess">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-xmark"></i> Rejected Operations:</span>
+                                        <strong class="text-warning" id="cmpMutexRejected">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-shield-halved"></i> Conflicts Blocked:</span>
+                                        <strong class="text-success" id="cmpMutexBlocked">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-people-line"></i> Waiting Threads:</span>
+                                        <strong id="cmpMutexWaiting">0 (Serialized)</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-shield-halved"></i> Synchronization Status:</span>
+                                        <span class="badge-success" id="cmpMutexSyncStatus">Protected (threading.Lock)</span>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-chair"></i> Final Seat Availability:</span>
+                                        <strong class="text-success font-mono" id="cmpMutexFinalSeats">1 Booked, N Blocked</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3: With Semaphore -->
+                                <div class="comp-stat-card card-info">
+                                    <div class="comp-card-badge">3. With Semaphore (Week 3)</div>
+                                    <h5 class="comp-stat-title">threading.Semaphore(N)</h5>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-calculator"></i> Total Runs:</span>
+                                        <strong id="cmpSemRuns">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-users"></i> Number of Requests:</span>
+                                        <strong id="cmpSemRequests">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-check"></i> Successful Operations:</span>
+                                        <strong class="text-info" id="cmpSemSuccess">0</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-xmark"></i> Rejected Operations:</span>
+                                        <strong id="cmpSemRejected">0 (Queued Safely)</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-traffic-light"></i> Permit Capacity:</span>
+                                        <strong class="text-info" id="cmpSemCapacity">3 Permits</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-people-line"></i> Waiting Threads:</span>
+                                        <strong id="cmpSemWaiting">Queued when &gt; Capacity</strong>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-shield-halved"></i> Synchronization Status:</span>
+                                        <span class="badge-info" id="cmpSemSyncStatus">Throttled (threading.Semaphore)</span>
+                                    </div>
+                                    <div class="comp-stat-row">
+                                        <span><i class="fa-solid fa-chair"></i> Final Seat Availability:</span>
+                                        <strong class="text-info font-mono" id="cmpSemFinalSeats">Batched in Waves</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Observed Difference & Scientific Explanation Callout -->
+                            <div class="observed-diff-box">
+                                <div class="diff-header">
+                                    <i class="fa-solid fa-graduation-cap text-warning"></i>
+                                    <h5 class="diff-title">Observed Difference &amp; Scientific Explanation (Step 6 Comparison)</h5>
+                                </div>
+                                <div class="diff-body">
+                                    <p><strong>1. Booking Without Mutex:</strong> Multiple uncoordinated customer threads execute interleaved check-then-act sequences across the shared SQLite database. Within the <em>Time-Of-Check to Time-Of-Use (TOCTOU)</em> gap, multiple threads simultaneously observe the seat as <code>is_booked = 0</code>, resulting in conflicting double-bookings. <br>
+                                    <span class="diff-highlight"><i class="fa-solid fa-triangle-exclamation"></i> <strong>Important Clarification:</strong> A race condition does NOT always produce duplicate bookings on every single run; duplicate bookings are an unpredictable, non-deterministic hazard resulting from uncoordinated thread interleaving and CPU scheduling.</span></p>
+                                    
+                                    <p><strong>2. Booking With Mutex:</strong> Python's <code>threading.Lock()</code> establishes strict binary <em>Mutual Exclusion</em>. Only one customer thread enters the Critical Section to check availability and write the reservation. Competing threads find the seat occupied and are safely rejected, guaranteeing exactly 0 collisions and 100% database integrity.</p>
+                                    
+                                    <p><strong>3. Booking Using Semaphore:</strong> Python's <code>threading.Semaphore(N)</code> enforces controlled throughput by allowing up to $N$ concurrent transactions to execute simultaneously. Surplus customer threads wait gracefully in the queue until an active thread releases its permit, preventing server connection pool exhaustion.</p>
+                                </div>
+                            </div>
+
+                            <!-- Theoretical Comparison Matrix Table -->
+                            <div class="table-responsive mt-4">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Feature / Metric</th>
+                                            <th class="text-danger">1. Without Mutex (Hazard)</th>
+                                            <th class="text-success">2. With Mutex Lock (Week 2)</th>
+                                            <th class="text-info">3. With Counting Semaphore (Week 3)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Underlying OS Primitive</strong></td>
+                                            <td>None (Unchecked shared memory)</td>
+                                            <td><code>threading.Lock()</code> (Futex / Binary Mutex)</td>
+                                            <td><code>threading.Semaphore(N)</code> (Integer Counter + Queue)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Threads Allowed in CS</strong></td>
+                                            <td>Unlimited (Unrestricted racing)</td>
+                                            <td><strong>Strictly 1 Thread</strong> at any time</td>
+                                            <td><strong>Up to $N$ Threads</strong> concurrently</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Double-Booking Hazard</strong></td>
+                                            <td><span class="badge-danger">HIGH RISK (Frequent)</span></td>
+                                            <td><span class="badge-success">ZERO (Mathematically Impossible)</span></td>
+                                            <td><span class="badge-success">ZERO (When paired with Mutex)</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Acquire / Wait Syntax</strong></td>
+                                            <td>N/A</td>
+                                            <td><code>mutex.acquire()</code> / <code>with mutex:</code></td>
+                                            <td><code>sem.acquire()</code> / <code>sem_wait()</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Release / Signal Syntax</strong></td>
+                                            <td>N/A</td>
+                                            <td><code>mutex.release()</code></td>
+                                            <td><code>sem.release()</code> / <code>sem_post()</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Best Used For</strong></td>
+                                            <td>Demonstrating failure to students</td>
+                                            <td>Single critical write resource (Seat allocation)</td>
+                                            <td>Throttling server connections, DB pools, rate limits</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- H. SHOW MANAGEMENT -->
+                <!-- ================================================================= -->
+                <section class="shows-section" id="show-management">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-clapperboard"></i> Cinema Show Management</h2>
+                            <p class="section-subtitle">Real-time view of all active movies, timings, screen allocations, and occupancy levels</p>
+                        </div>
+                    </div>
+
+                    <div class="shows-cards-grid" id="showsCardsGrid">
+                        <!-- Populated dynamically by script.js -->
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- I. BOOKING HISTORY TABLE -->
+                <!-- ================================================================= -->
+                <section class="history-section" id="booking-history">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Booking History & Transactions</h2>
+                            <p class="section-subtitle">Detailed audit trail of all confirmed single and group reservations with thread telemetry</p>
+                        </div>
+                        <div class="table-search-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="bookingSearchInput" class="form-control" placeholder="Search by name, ref code, or seats...">
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card table-card">
+                        <div class="table-responsive">
+                            <table class="custom-table" id="bookingsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Booking Ref</th>
+                                        <th>Customer / Group</th>
+                                        <th>Show & Screen</th>
+                                        <th>Seats Booked</th>
+                                        <th>Total Paid</th>
+                                        <th>Sync Mode</th>
+                                        <th>Thread ID</th>
+                                        <th>Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTableBody">
+                                    <!-- Populated dynamically -->
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">Loading booking records...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- J. SETTINGS & CONCURRENCY CONTROLS -->
+                <!-- ================================================================= -->
+                <section class="settings-section" id="settings">
+                    <div class="section-header-row">
+                        <div>
+                            <h2 class="section-title"><i class="fa-solid fa-sliders"></i> System Settings & Demonstration Controls</h2>
+                            <p class="section-subtitle">Configure concurrency parameters, semaphore capacities, and database reset tools</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid">
+                        <!-- Card 1: Semaphore Capacity Settings -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fa-solid fa-traffic-light"></i> Counting Semaphore Configuration</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="setting-desc">Control the maximum number of simultaneous booking transactions permitted across all cinema screens.</p>
+                                <div class="form-group">
+                                    <label class="form-label" for="semaphoreLimitInput">Max Concurrent Transaction Slots (1 - 10):</label>
+                                    <div class="input-action-group">
+                                        <input type="number" id="semaphoreLimitInput" class="form-control" min="1" max="10" value="3">
+                                        <button class="btn btn-primary" id="saveSemaphoreLimitBtn">Update Capacity</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Database Re-seed & Reset -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fa-solid fa-database"></i> Database Seed & System Reset</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="setting-desc">Reset all seats, bookings, and concurrency counters back to pristine initial state for a fresh demonstration.</p>
+                                <button class="btn btn-danger" id="resetSystemBtn">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Reset Entire System & Re-Seed
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Academic Concept Cheat Sheet -->
+                        <div class="dashboard-card full-col">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fa-solid fa-graduation-cap"></i> University Viva / Faculty Review Guide</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="faq-grid">
+                                    <div class="faq-item">
+                                        <h5><i class="fa-solid fa-lock text-primary"></i> What is a Mutex Lock?</h5>
+                                        <p>A Mutex (Mutual Exclusion) lock ensures that only one thread can execute a critical section at any given time. In this application, checking seat availability and booking seats is enclosed in a Mutex block (<code>with booking_mutex:</code>) to prevent race conditions.</p>
+                                    </div>
+                                    <div class="faq-item">
+                                        <h5><i class="fa-solid fa-traffic-light text-warning"></i> What is a Counting Semaphore?</h5>
+                                        <p>A Counting Semaphore maintains a counter representing available permits. It allows up to $N$ concurrent threads to proceed simultaneously (here, $N=3$). Once all permits are exhausted, subsequent threads must wait in queue until a permit is released.</p>
+                                    </div>
+                                    <div class="faq-item">
+                                        <h5><i class="fa-solid fa-triangle-exclamation text-danger"></i> What is a Race Condition?</h5>
+                                        <p>A race condition occurs when two or more threads access shared resources and try to modify them concurrently. Without synchronization, Thread A checks seat A5 (finds it free), pauses for payment processing, while Thread B checks seat A5 and books it. Thread A then finishes and also books seat A5, resulting in double-booking.</p>
+                                    </div>
+                                    <div class="faq-item">
+                                        <h5><i class="fa-solid fa-users text-success"></i> How does Group Booking maintain Atomicity?</h5>
+                                        <p>Group booking allocates multiple seats (e.g. A1, A2, A3) together. If even one seat in the group is already booked, the entire transaction rolls back cleanly, adhering to ACID atomicity principles.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- BOOKING SUCCESS / RECEIPT MODAL -->
+    <!-- ========================================================================= -->
+    <div class="modal-backdrop" id="receiptModal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-circle-check text-success modal-icon"></i>
+                    <h4>Reservation Confirmed!</h4>
+                </div>
+                <button class="close-modal-btn" id="closeReceiptModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="receipt-ticket">
+                    <div class="ticket-header">
+                        <span class="ticket-brand">CinemaPro Theaters</span>
+                        <span class="ticket-badge" id="modalTicketCode">GRP-89F12A</span>
+                    </div>
+                    <div class="ticket-movie-title" id="modalMovieTitle">Inception (IMAX 2D)</div>
+                    <div class="ticket-details-grid">
+                        <div>
+                            <span class="t-label">Customer / Group</span>
+                            <span class="t-val" id="modalCustomerName">Stanford CS</span>
+                        </div>
+                        <div>
+                            <span class="t-label">Seats Allocated</span>
+                            <span class="t-val text-primary" id="modalSeatsList">A1, A2, A3</span>
+                        </div>
+                        <div>
+                            <span class="t-label">Total Amount</span>
+                            <span class="t-val text-success" id="modalTotalPaid">₹1,050.00</span>
+                        </div>
+                        <div>
+                            <span class="t-label">Concurrency Mode</span>
+                            <span class="t-val" id="modalSyncMode">Mutex Protected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="printReceiptBtn"><i class="fa-solid fa-print"></i> Print Ticket</button>
+                <button class="btn btn-primary" id="dismissReceiptBtn">Close & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Custom JavaScript -->
+    <script src="/static/script.js?v=2.2"></script>
+</body>
+</html>

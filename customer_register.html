@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPro – Customer Registration</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=2.1">
+</head>
+<body class="dark-theme login-body">
+    <div class="login-wrapper">
+        <!-- Ambient background glows -->
+        <div class="login-bg-glow glow-1"></div>
+        <div class="login-bg-glow glow-2"></div>
+
+        <div class="login-card dashboard-card" style="max-width: 500px;">
+            <!-- Back to Portals link -->
+            <a href="/customer/login" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Customer Login
+            </a>
+
+            <div class="login-header">
+                <div class="login-brand">
+                    <div class="logo-icon-wrapper">
+                        <i class="fa-solid fa-film logo-icon"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Cinema<span class="gradient-text">Pro</span></span>
+                        <span class="logo-subtitle">Customer Registration</span>
+                    </div>
+                </div>
+                <div class="badge-customer" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3);">
+                    <i class="fa-solid fa-user-plus"></i> Create Customer Account
+                </div>
+                <h2 class="login-main-title">Join CinemaPro</h2>
+                <p class="login-main-subtitle">Register to book movie tickets, manage personal reservations, and download printable E-Tickets</p>
+            </div>
+
+            <!-- Flash Error Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="login-flash-messages">
+                        {% for category, message in messages %}
+                            <div class="login-flash-alert alert-{{ category }}">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Registration Form -->
+            <form action="/customer/register" method="POST" class="login-form" id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="regFullName">
+                        <i class="fa-solid fa-id-card"></i> Full Name <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fa-regular fa-user input-icon"></i>
+                        <input type="text" id="regFullName" name="full_name" class="form-control" placeholder="e.g. Rahul Sharma" required autofocus autocomplete="name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regUsername">
+                        <i class="fa-solid fa-at"></i> Username <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fa-regular fa-user-circle input-icon"></i>
+                        <input type="text" id="regUsername" name="username" class="form-control" placeholder="Choose a username (e.g. rahul2026)" required autocomplete="username" pattern="^[a-zA-Z0-9_]{3,30}$" title="3-30 letters, numbers, or underscores">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="regPhone">
+                            <i class="fa-solid fa-phone"></i> Mobile Phone <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fa-solid fa-mobile-screen input-icon"></i>
+                            <input type="tel" id="regPhone" name="phone" class="form-control" placeholder="9876543210" required autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="regEmail">
+                            <i class="fa-solid fa-envelope"></i> Email Address
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fa-regular fa-envelope input-icon"></i>
+                            <input type="email" id="regEmail" name="email" class="form-control" placeholder="rahul@example.com" autocomplete="email">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regPassword">
+                        <i class="fa-solid fa-lock"></i> Password <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-with-icon password-field-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input type="password" id="regPassword" name="password" class="form-control" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" id="passToggleBtn1" title="Toggle password visibility">
+                            <i class="fa-regular fa-eye" id="toggleIcon1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regConfirmPassword">
+                        <i class="fa-solid fa-shield-check"></i> Confirm Password <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-with-icon password-field-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input type="password" id="regConfirmPassword" name="confirm_password" class="form-control" placeholder="Re-enter password" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" id="passToggleBtn2" title="Toggle password visibility">
+                            <i class="fa-regular fa-eye" id="toggleIcon2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-glow login-submit-btn" id="registerSubmitBtn">
+                    <i class="fa-solid fa-user-plus"></i> Complete Customer Registration
+                </button>
+            </form>
+
+            <div class="auth-switch-prompt" style="text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-secondary);">
+                Already have a customer account?
+                <a href="/customer/login" style="color: var(--primary-blue); font-weight: 600; text-decoration: none; margin-left: 4px;">
+                    Sign in here <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="login-card-footer">
+                <a href="/" style="color: var(--text-muted); font-size: 11.5px; text-decoration: none;">
+                    <i class="fa-solid fa-house"></i> Return to Welcome Portal Selection
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password toggle script -->
+    <script>
+        function setupToggle(btnId, inputId, iconId) {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (btn && input && icon) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+        }
+        setupToggle('passToggleBtn1', 'regPassword', 'toggleIcon1');
+        setupToggle('passToggleBtn2', 'regConfirmPassword', 'toggleIcon2');
+
+        // Client validation on submit
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            const p1 = document.getElementById('regPassword').value;
+            const p2 = document.getElementById('regConfirmPassword').value;
+            if (p1 !== p2) {
+                e.preventDefault();
+                alert('Passwords do not match. Please verify.');
+            }
+        });
+    </script>
+</body>
+</html>

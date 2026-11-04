@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPro – Customer Sign In</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=2.1">
+</head>
+<body class="dark-theme login-body">
+    <div class="login-wrapper">
+        <!-- Ambient background glows -->
+        <div class="login-bg-glow glow-1"></div>
+        <div class="login-bg-glow glow-2"></div>
+
+        <div class="login-card dashboard-card">
+            <!-- Back to Portals link -->
+            <a href="/" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Portal Selection
+            </a>
+
+            <div class="login-header">
+                <div class="login-brand">
+                    <div class="logo-icon-wrapper">
+                        <i class="fa-solid fa-film logo-icon"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Cinema<span class="gradient-text">Pro</span></span>
+                        <span class="logo-subtitle">Customer Portal</span>
+                    </div>
+                </div>
+                <div class="badge-customer" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3);">
+                    <i class="fa-solid fa-user"></i> Moviegoer Access
+                </div>
+                <h2 class="login-main-title">Customer Sign In</h2>
+                <p class="login-main-subtitle">Log in to view your bookings, select seats, and reserve movie tickets</p>
+            </div>
+
+            <!-- Flash Error Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="login-flash-messages">
+                        {% for category, message in messages %}
+                            <div class="login-flash-alert alert-{{ category }}">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Login Form -->
+            <form action="/customer/login" method="POST" class="login-form" id="custLoginForm">
+                <input type="hidden" name="next" value="{{ next_url or '' }}">
+
+                <div class="form-group">
+                    <label class="form-label" for="loginUsername">
+                        <i class="fa-solid fa-user"></i> Customer Username
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fa-regular fa-user-circle input-icon"></i>
+                        <input type="text" id="loginUsername" name="username" class="form-control" placeholder="Enter your username (e.g. customer1)" required autofocus autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">
+                        <i class="fa-solid fa-lock"></i> Account Password
+                    </label>
+                    <div class="input-with-icon password-field-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input type="password" id="loginPassword" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" id="passwordToggleBtn" title="Toggle password visibility">
+                            <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-glow login-submit-btn" id="loginSubmitBtn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign In to Customer Portal
+                </button>
+            </form>
+
+            <div class="auth-switch-prompt" style="text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-secondary);">
+                Don't have a customer account?
+                <a href="/customer/register" style="color: var(--primary-blue); font-weight: 600; text-decoration: none; margin-left: 4px;">
+                    Register here <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Demo Customer Credentials Box -->
+            <div class="eval-credentials-box" style="margin-top: 22px;">
+                <div class="eval-header">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <strong>Pre-Seeded Demo Customer Account:</strong>
+                </div>
+                <div class="eval-creds-grid">
+                    <div class="eval-cred-item">
+                        <span class="cred-label">Username:</span>
+                        <code class="cred-code" id="copyCustUser" title="Click to fill">customer1</code>
+                    </div>
+                    <div class="eval-cred-item">
+                        <span class="cred-label">Password:</span>
+                        <code class="cred-code" id="copyCustPass" title="Click to fill">pass123</code>
+                    </div>
+                </div>
+                <div class="eval-footer-note">
+                    <i class="fa-solid fa-shield-halved text-success"></i>
+                    <span>Customers have strict access control and can only view their own personal bookings.</span>
+                </div>
+            </div>
+
+            <div class="login-card-footer">
+                <a href="/admin/login" style="color: var(--text-muted); font-size: 11.5px; text-decoration: none;">
+                    <i class="fa-solid fa-lock"></i> Staff or Administrator? Switch to Admin Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Password Visibility Script & 1-click credential filler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('loginPassword');
+            const toggleBtn = document.getElementById('passwordToggleBtn');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const copyUser = document.getElementById('copyCustUser');
+            const copyPass = document.getElementById('copyCustPass');
+            const usernameInput = document.getElementById('loginUsername');
+
+            if (toggleBtn && passwordInput && toggleIcon) {
+                toggleBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.classList.remove('fa-eye');
+                        toggleIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.classList.remove('fa-eye-slash');
+                        toggleIcon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            if (copyUser && usernameInput) {
+                copyUser.addEventListener('click', () => {
+                    usernameInput.value = 'customer1';
+                    usernameInput.focus();
+                });
+            }
+            if (copyPass && passwordInput) {
+                copyPass.addEventListener('click', () => {
+                    passwordInput.value = 'pass123';
+                    passwordInput.focus();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
